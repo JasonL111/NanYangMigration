@@ -180,8 +180,9 @@ class Harness:
                 out = self.resolve(value, obj)
             else:
                 val = self.resolve(value, obj)
-                if key == 'min': out = min(out, val)
-                elif key == 'max': out = max(out, val)
+                # Jomini min/max specify lower/upper BOUNDS, not Python functions.
+                if key == 'min': out = max(out, val)
+                elif key == 'max': out = min(out, val)
                 elif key == 'add': out += val
                 elif key == 'subtract': out -= val
                 elif key == 'divide': out /= val

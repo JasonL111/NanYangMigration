@@ -27,14 +27,15 @@ def world(uses=0, available=10_000_000, split=1, religion='confucian'):
 class Files(unittest.TestCase):
     def test_metadata(self):
         d = json.loads((MOD/'.metadata/metadata.json').read_text())
-        self.assertEqual(d['version'], '1.0.0')
+        self.assertEqual(d['version'], '1.0.1')
         self.assertEqual(d['supported_game_version'], '1.13.11')
 
     def test_all_scripts_parse_and_no_empty_files(self):
         for f in MOD.rglob('*'):
             if f.is_file(): self.assertGreater(f.stat().st_size, 0, str(f))
             if f.is_dir(): self.assertTrue(list(f.iterdir()), str(f))
-            if f.suffix == '.txt': parse(f.read_text(encoding='utf-8-sig'))
+            if f.suffix == '.txt' and f.relative_to(MOD).parts[0] in ('common', 'events'):
+                parse(f.read_text(encoding='utf-8-sig'))
 
     def test_localizations(self):
         keys = []
@@ -99,6 +100,15 @@ class Files(unittest.TestCase):
         self.assertNotIn('on_weekly_pulse', text)
 
 class Mathematics(unittest.TestCase):
+    def test_jomini_bounds_semantics(self):
+        # Vanilla 00_diplomacy_values.txt clamps to [0.01, 0.05] with
+        # min = 0.01, max = 0.05; these are bounds, not Python min()/max().
+        h = Harness(MOD)
+        self.assertEqual(h.formula(parse('value = 100 max = 7'), h.country), 7)
+        self.assertEqual(h.formula(parse('value = -2 min = 0'), h.country), 0)
+        self.assertEqual(h.formula(parse('value = 8 min = 0'), h.country), 8)
+        self.assertEqual(h.formula(parse('value = 100 max = 50 max = 20'), h.country), 20)
+
     def test_matrix(self):
         self.assertEqual([sum(row[i] for row in MATRIX.values()) for i in range(4)], [45,30,15,10])
         self.assertEqual([sum(row) for row in MATRIX.values()], [35,25,20,12,5,3])

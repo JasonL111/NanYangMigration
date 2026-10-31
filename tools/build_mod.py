@@ -48,7 +48,7 @@ def table_value(name, nums):
 def main():
     write('.metadata/metadata.json', json.dumps({
         'name': '下南洋 · Nanyang Migration', 'id': 'nanyang_migration',
-        'version': '1.0.0', 'supported_game_version': '1.13.11',
+        'version': '1.0.1', 'supported_game_version': '1.13.11',
         'short_description': 'Player-organized Chinese migration to Southeast Asian states.',
         'tags': ['Gameplay', 'Historical'],
         'relationships': [], 'game_custom_data': {'multiplayer_synchronized': True},
@@ -96,8 +96,8 @@ nym_last_target = {
 # Pop scope: cap against the click-time balance, live population and destination quota.
 nym_take = {
     value = total_size
-    min = var:nym_available
-    min = scope:nym_country.var:nym_quota
+    max = var:nym_available
+    max = scope:nym_country.var:nym_quota
     floor = yes
 }
 nym_state_share = {
@@ -108,7 +108,7 @@ nym_state_share = {
 nym_destination_delta = {
     value = scope:nym_destination.state_population
     subtract = var:nym_before
-    max = 0
+    min = 0
 }
 '''
     write('common/script_values/nanyang_values.txt', values)
@@ -275,7 +275,7 @@ nanyang_migration.2 = {
         'nym_success_title': '南洋的新家园',
         'nym_success_desc': '本次目标：' + dyn('nym_last_target') + ' 人。\\n实际迁移：' + dyn('nym_last') + ' 人。\\n累计成功：' + dyn('nym_uses') + ' 次。下次目标：' + dyn('nym_target') + ' 人。\\n已进入5年冷却。人口不足或目的地不可用的份额不会用其他文化或地区补足。移民保留文化与宗教，抵达后按原生规则失业或转职。',
         'nym_failure_title': '航程未能启行',
-        'nym_failure_desc': '没有实际转移任何人口。可能缺少四种文化的可迁移人口、有效目的州，或来源与目的相同。此次未增加成功次数，也未消耗冷却；上一次成功记录保持不变。',
+        'nym_failure_desc': '本次记录的迁入量为零，因此未增加成功次数或消耗冷却。这不等于全国人口不足：请检查可迁移文化、有效目的州以及脚本错误日志。若人口实际变化而记录为零，属于脚本或统计错误；上一次成功记录保持不变。',
         'nym_ack': '知悉',
     }
     en = {
@@ -288,7 +288,7 @@ nanyang_migration.2 = {
         'nym_success_title': 'New Homes in Nanyang',
         'nym_success_desc': 'Target: ' + dyn('nym_last_target') + ' persons.\\nActually moved: ' + dyn('nym_last') + '.\\nSuccessful expeditions: ' + dyn('nym_uses') + '. Next target: ' + dyn('nym_target') + '.\\nA five-year cooldown has begun. Unavailable shares are not reassigned. Migrants retain their culture and religion; native rules govern unemployment and occupational changes.',
         'nym_failure_title': 'The Expedition Could Not Depart',
-        'nym_failure_desc': 'No people were actually transferred. Eligible source populations or valid destination states may be unavailable, or sources may coincide with destinations. No successful use or cooldown was consumed. The last successful record is unchanged.',
+        'nym_failure_desc': 'Recorded arrivals are zero. No successful use or cooldown was consumed. This does not establish a national population shortage: check eligible cultures, destinations and script error logs. If populations changed despite a zero record, this is a script or accounting error. The last successful record is unchanged.',
         'nym_ack': 'Understood',
     }
     for lang, data in [('simp_chinese', zh), ('english', en)]:

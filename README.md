@@ -1,6 +1,6 @@
 # 下南洋 / Nanyang Migration
 
-Victoria 3 原生脚本 Mod，版本 **1.0.0**，目标游戏版本 **1.13.11 (Matcha)**。
+Victoria 3 原生脚本 Mod，版本 **1.0.1**，目标游戏版本 **1.13.11 (Matcha)**。
 
 - 安装目录：[nanyang_migration](nanyang_migration/)
 - 安装包：`nanyang_migration.zip`

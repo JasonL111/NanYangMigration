@@ -20,10 +20,11 @@ test_native_timer_and_permanent_journal (test_mod.Files.test_native_timer_and_pe
 test_no_fake_population_creation (test_mod.Files.test_no_fake_population_creation) ... ok
 test_versioned_identifiers (test_mod.Files.test_versioned_identifiers) ... ok
 test_growth_from_actual_script_values (test_mod.Mathematics.test_growth_from_actual_script_values) ... ok
+test_jomini_bounds_semantics (test_mod.Mathematics.test_jomini_bounds_semantics) ... ok
 test_matrix (test_mod.Mathematics.test_matrix) ... ok
 test_rounding_from_emitted_values (test_mod.Mathematics.test_rounding_from_emitted_values) ... ok
 
 ----------------------------------------------------------------------
-Ran 23 tests in 0.245s
+Ran 24 tests in 0.236s
 
 OK

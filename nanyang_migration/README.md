@@ -1,4 +1,4 @@
-# 下南洋 · Nanyang Migration 1.0.0
+# 下南洋 · Nanyang Migration 1.0.1
 
 目标版本：**Victoria 3 1.13.11 (Matcha)**。原生 Paradox Script，运行时无外部依赖。
 这是已生成并通过静态/模拟执行检查的安装候选包；本环境没有游戏，
@@ -138,3 +138,10 @@ enable it. If local discovery is unavailable, register a local mod through the L
 then copy the content folders into that mod and retain its generated registration metadata.
 Start as China and use the permanent Journal button. English and Simplified Chinese are provided.
 Target: 1.13.11; native-engine loading and gameplay have **not** been tested in this cloud environment.
+
+## 1.0.1 更新须知
+
+修复原生Script Value的min/max上下界反用，包含迁入统计归零与抽取量超限两处。
+1.0.0显示失败也可能已经迁移了人口，请优先载入点击之前的存档。
+完全退出游戏后删除旧Mod目录，再解压新版覆盖安装，避免两个版本同时启用。
+本版经24项静态/模拟测试，尚无游戏内实测。

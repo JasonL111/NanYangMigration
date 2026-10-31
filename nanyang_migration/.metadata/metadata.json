@@ -1,7 +1,7 @@
 {
   "name": "下南洋 · Nanyang Migration",
   "id": "nanyang_migration",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "supported_game_version": "1.13.11",
   "short_description": "Player-organized Chinese migration to Southeast Asian states.",
   "tags": [

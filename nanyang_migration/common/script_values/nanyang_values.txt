@@ -175,8 +175,8 @@ nym_plan_burma_yue = {
 # Pop scope: cap against the click-time balance, live population and destination quota.
 nym_take = {
     value = total_size
-    min = var:nym_available
-    min = scope:nym_country.var:nym_quota
+    max = var:nym_available
+    max = scope:nym_country.var:nym_quota
     floor = yes
 }
 nym_state_share = {
@@ -187,5 +187,5 @@ nym_state_share = {
 nym_destination_delta = {
     value = scope:nym_destination.state_population
     subtract = var:nym_before
-    max = 0
+    min = 0
 }
