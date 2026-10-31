@@ -48,7 +48,7 @@ def table_value(name, nums):
 def main():
     write('.metadata/metadata.json', json.dumps({
         'name': '下南洋 · Nanyang Migration', 'id': 'nanyang_migration',
-        'version': '1.0.1', 'supported_game_version': '1.13.11',
+        'version': '1.0.2', 'supported_game_version': '1.13.11',
         'short_description': 'Player-organized Chinese migration to Southeast Asian states.',
         'tags': ['Gameplay', 'Historical'],
         'relationships': [], 'game_custom_data': {'multiplayer_synchronized': True},
@@ -158,6 +158,10 @@ nym_execute = {
     }
     set_variable = { name = nym_requested value = nym_target }
     set_variable = { name = nym_actual value = 0 }
+    set_variable = { name = nym_source_count value = 0 }
+    set_variable = { name = nym_source_people value = 0 }
+    set_variable = { name = nym_transfer_calls value = 0 }
+    set_variable = { name = nym_transfer_requested value = 0 }
     # Snapshot the source objects and their pre-migration balance. Newly created
     # arrival objects are never added. Existing arrival objects cannot expand balances.
     every_scope_pop = {
@@ -165,6 +169,11 @@ nym_execute = {
         set_variable = { name = nym_available value = total_size }
         set_variable = { name = nym_origin value = state }
         add_to_list = nym_sources
+        save_scope_value_as = { name = nym_source_size value = total_size }
+        scope:nym_country = {
+            change_variable = { name = nym_source_count add = 1 }
+            change_variable = { name = nym_source_people add = scope:nym_source_size }
+        }
     }
 '''
     for r in REGIONS:
@@ -235,6 +244,8 @@ nym_transfer = {
         change_variable = { name = nym_available subtract = scope:nym_amount }
         scope:nym_country = {
             set_variable = { name = nym_before value = scope:nym_destination.state_population }
+            change_variable = { name = nym_transfer_calls add = 1 }
+            change_variable = { name = nym_transfer_requested add = scope:nym_amount }
         }
         move_partial_pop = { state = scope:nym_destination population = scope:nym_amount }
         scope:nym_country = {
@@ -292,6 +303,26 @@ nanyang_migration.2 = {
         'nym_ack': 'Understood',
     }
     for lang, data in [('simp_chinese', zh), ('english', en)]:
+        val = lambda name: "[GetPlayer.MakeScope.Var('" + name + "').GetValue|0]"
+        if lang == 'simp_chinese':
+            diagnostic = ('\\n\\n1.0.2 诊断：来源POP数 ' + val('nym_source_count') + '；来源总人口 ' + val('nym_source_people')
+                + '。\\n目的州数（马来亚/东印度/暹罗/印度支那/菲律宾/缅甸）：'
+                + '/'.join(val('nym_count_'+r) for r in REGIONS)
+                + '。\\n转移调用次数 ' + val('nym_transfer_calls') + '；请求人口合计 ' + val('nym_transfer_requested')
+                + '；记录迁入合计 ' + val('nym_actual') + '。\\n若调用大于零但记录为零，不能认定没有移动人口，请保留截图与本次error.log，勿反复点击。')
+            data['nym_failure_title'] = '下南洋 1.0.2：迁移记录为零'
+            data['nym_failure_desc'] = '此次未增加成功次数或消耗冷却。此提示不能认定全国人口不足；下方是本次各阶段记录。'
+        else:
+            diagnostic = ('\\n\\n1.0.2 diagnostics: source POPs ' + val('nym_source_count') + '; source persons ' + val('nym_source_people')
+                + '.\\nDestination states (Malaya/East Indies/Siam/Indochina/Philippines/Burma): '
+                + '/'.join(val('nym_count_'+r) for r in REGIONS)
+                + '.\\nMove calls ' + val('nym_transfer_calls') + '; requested persons ' + val('nym_transfer_requested')
+                + '; recorded arrivals ' + val('nym_actual')
+                + '.\\nIf calls are positive but arrivals are zero, population may have moved. Retain this report and error.log; do not repeatedly click.')
+            data['nym_failure_title'] = 'Nanyang 1.0.2: Zero Recorded Arrivals'
+            data['nym_failure_desc'] = 'No successful use or cooldown was consumed. This report does not establish a national population shortage.'
+        data['nym_failure_desc'] += diagnostic
+        data['nym_success_desc'] += diagnostic
         write(f'localization/{lang}/nanyang_l_{lang}.yml', f'l_{lang}:\n' + '\n'.join(f' {k}:0 "{v}"' for k, v in data.items()), bom=True)
     write('docs/design.json', json.dumps({'cultures': CULTURES, 'matrix': MATRIX,
           'regions': REGIONS, 'targets': TARGETS, 'rounding': 'Hamilton, row-major tie break',

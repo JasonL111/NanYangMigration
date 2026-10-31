@@ -7,6 +7,10 @@ nym_execute = {
     }
     set_variable = { name = nym_requested value = nym_target }
     set_variable = { name = nym_actual value = 0 }
+    set_variable = { name = nym_source_count value = 0 }
+    set_variable = { name = nym_source_people value = 0 }
+    set_variable = { name = nym_transfer_calls value = 0 }
+    set_variable = { name = nym_transfer_requested value = 0 }
     # Snapshot the source objects and their pre-migration balance. Newly created
     # arrival objects are never added. Existing arrival objects cannot expand balances.
     every_scope_pop = {
@@ -14,6 +18,11 @@ nym_execute = {
         set_variable = { name = nym_available value = total_size }
         set_variable = { name = nym_origin value = state }
         add_to_list = nym_sources
+        save_scope_value_as = { name = nym_source_size value = total_size }
+        scope:nym_country = {
+            change_variable = { name = nym_source_count add = 1 }
+            change_variable = { name = nym_source_people add = scope:nym_source_size }
+        }
     }
     set_variable = { name = nym_count_malaya value = 0 }
     every_state = {
@@ -127,6 +136,8 @@ nym_transfer = {
         change_variable = { name = nym_available subtract = scope:nym_amount }
         scope:nym_country = {
             set_variable = { name = nym_before value = scope:nym_destination.state_population }
+            change_variable = { name = nym_transfer_calls add = 1 }
+            change_variable = { name = nym_transfer_requested add = scope:nym_amount }
         }
         move_partial_pop = { state = scope:nym_destination population = scope:nym_amount }
         scope:nym_country = {

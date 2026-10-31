@@ -1,16 +1,16 @@
 {
-  ".metadata/metadata.json": "20554e6a19174009264d92538603ceaf4986e471789bedb586a876d94e3470a3",
-  "README.md": "f689ec5afbd2055289f42289e0d1160ded89dcb25a73fd5f3810fbb166104e92",
+  ".metadata/metadata.json": "f5cc20620339e0c3ac1706eb223d876a7f61e67de1610de97819f0e9590db063",
+  "README.md": "9817768f63e8d85858e930c46e158d030c8af3b5f368a40dd3957f1ab399a696",
   "common/journal_entries/nanyang_journal.txt": "2867ce5ea31ea2567ee52ce19088f44e96f58855aecfed454520dffaf31ea4ab",
   "common/script_values/nanyang_values.txt": "3ffab0cdb20a290123b82882c82cdeb483122dc1c70b9e89867d23d463da0b03",
   "common/scripted_buttons/nanyang_buttons.txt": "52ef737a06d1f816b73efa54d21f2fab3ea28c31bf74a6522fe4597b53e8df0c",
-  "common/scripted_effects/nanyang_effects.txt": "d9cdde94801396415dca3723ca5fd4eb2490c1232350655a4c91e8a277b8416c",
+  "common/scripted_effects/nanyang_effects.txt": "9704c769490767d8899c975b6c407e393252509ea9de0b3a4b672b9d2d511be7",
   "common/scripted_triggers/nanyang_triggers.txt": "8852219c436bf8a94fc7e4c8c3bdf8e19f9e2217989faed7e7a2d4a673cb0bf6",
-  "docs/VALIDATION.md": "ac257430eaaee59651fee6345adfee7f6035a44b37f5d8933222e91578b98417",
+  "docs/VALIDATION.md": "fd214251aa8e2ddd96f95c7b642719f399d31954e24c21a20fae799a6f7d3fb1",
   "docs/design.json": "dd0355d4330d6547a9146200f9a800e83427ff06eaa5bcf96dad2f0643feda7c",
   "docs/reference_ids.json": "dcc77d05d1e6a8c1e347f1af466dd7512d29d4acf95e2067af84a6ea07a89db6",
-  "docs/test-results.txt": "ab1ddf2373aa12e43ea63c9ed94ec72b114add2e7d5b8cdc949ce4c16b1812ad",
+  "docs/test-results.txt": "018d03f187612f57dd76974a150183bf9a7bec4c634c5eeb75cff3a4258456ac",
   "events/nanyang_events.txt": "061e9a343ecc7d93361d239d8024bce40526123fedef2123c4a448bfdc8917f7",
-  "localization/english/nanyang_l_english.yml": "2159b12d908f1b86de4f1f6375f26168224b0b57c2ff1d8f97cf630aef23ab69",
-  "localization/simp_chinese/nanyang_l_simp_chinese.yml": "bd4914f2bc251ae3680beb7ff42aa5bc944a969dbd532639c341617fadf0b334"
+  "localization/english/nanyang_l_english.yml": "e3274ba2661b8d3d408c69e6abdef59c684984f7e43a146b7e02040dd8a3cf23",
+  "localization/simp_chinese/nanyang_l_simp_chinese.yml": "c6c9228014833c1d624b92621b7c5f94c00b58c6b812bd129e353fe1857c89ef"
 }

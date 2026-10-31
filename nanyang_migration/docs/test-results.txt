@@ -3,6 +3,7 @@ test_ai_disabled (test_mod.Execution.test_ai_disabled) ... ok
 test_cooldown_reload_successor_and_resume (test_mod.Execution.test_cooldown_reload_successor_and_resume) ... ok
 test_culture_shortage_no_substitution (test_mod.Execution.test_culture_shortage_no_substitution) ... ok
 test_destination_ownership_irrelevant (test_mod.Execution.test_destination_ownership_irrelevant) ... ok
+test_diagnostic_counters (test_mod.Execution.test_diagnostic_counters) ... ok
 test_failure_preserves_last_success (test_mod.Execution.test_failure_preserves_last_success) ... ok
 test_full_transfer_and_matrix_all_six_levels (test_mod.Execution.test_full_transfer_and_matrix_all_six_levels) ... ok
 test_limited_source_never_negative (test_mod.Execution.test_limited_source_never_negative) ... ok
@@ -25,6 +26,6 @@ test_matrix (test_mod.Mathematics.test_matrix) ... ok
 test_rounding_from_emitted_values (test_mod.Mathematics.test_rounding_from_emitted_values) ... ok
 
 ----------------------------------------------------------------------
-Ran 24 tests in 0.236s
+Ran 25 tests in 0.265s
 
 OK

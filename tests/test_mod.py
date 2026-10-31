@@ -27,7 +27,7 @@ def world(uses=0, available=10_000_000, split=1, religion='confucian'):
 class Files(unittest.TestCase):
     def test_metadata(self):
         d = json.loads((MOD/'.metadata/metadata.json').read_text())
-        self.assertEqual(d['version'], '1.0.1')
+        self.assertEqual(d['version'], '1.0.2')
         self.assertEqual(d['supported_game_version'], '1.13.11')
 
     def test_all_scripts_parse_and_no_empty_files(self):
@@ -52,7 +52,7 @@ class Files(unittest.TestCase):
         for f in MOD.rglob('*.txt'):
             required.update(re.findall(r'\b(?:name|desc|title|text)\s*=\s*(nym_\w+)\b', f.read_text()))
         # Numeric variable names are not localisation references.
-        required = {x for x in required if x not in {'nym_uses','nym_last','nym_last_target','nym_requested','nym_actual','nym_cell_unassigned','nym_states_left','nym_cell_actual','nym_quota','nym_delta','nym_before','nym_available','nym_origin','nym_amount','nym_cooldown'} and not x.startswith(('nym_count_', 'nym_actual_'))}
+        required = {x for x in required if x not in {'nym_uses','nym_last','nym_last_target','nym_requested','nym_actual','nym_cell_unassigned','nym_states_left','nym_cell_actual','nym_quota','nym_delta','nym_before','nym_available','nym_origin','nym_amount','nym_cooldown','nym_source_count','nym_source_size','nym_source_people','nym_transfer_calls','nym_transfer_requested'} and not x.startswith(('nym_count_', 'nym_actual_'))}
         self.assertLessEqual(required, keys[0])
 
     def test_definition_references(self):
@@ -134,6 +134,20 @@ class Mathematics(unittest.TestCase):
                 self.assertLess(abs(amount-target*weight/100), 1)
 
 class Execution(unittest.TestCase):
+    def test_diagnostic_counters(self):
+        h = world()
+        h.click()
+        self.assertEqual(h.country.vars['nym_source_count'], 4)
+        self.assertEqual(h.country.vars['nym_source_people'], 40_000_000)
+        self.assertEqual(h.country.vars['nym_transfer_requested'], 2_000_000)
+        self.assertEqual(h.country.vars['nym_transfer_calls'], len(CELLS))
+        h = world()
+        h.states = h.states[:1]
+        h.click()
+        self.assertEqual(h.country.vars['nym_source_count'], 4)
+        self.assertEqual(h.country.vars['nym_transfer_calls'], 0)
+        self.assertEqual(h.country.vars['nym_transfer_requested'], 0)
+
     def test_full_transfer_and_matrix_all_six_levels(self):
         for uses,target in enumerate(TARGETS):
             with self.subTest(uses=uses):
