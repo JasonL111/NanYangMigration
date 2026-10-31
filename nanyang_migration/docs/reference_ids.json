@@ -1,0 +1,52 @@
+{
+  "version": "1.13.11 (Matcha)",
+  "source": "https://github.com/alcaras/v3ref",
+  "commit": "bd8e3f7da313a57d0509559d59cff7617cc49513",
+  "cultures": [
+    "hakka",
+    "han",
+    "min",
+    "yue"
+  ],
+  "states": [
+    "STATE_ACEH",
+    "STATE_ANNAM",
+    "STATE_ARAKAN",
+    "STATE_BANGKOK",
+    "STATE_CAMBODIA",
+    "STATE_CELEBES",
+    "STATE_CENTRAL_JAVA",
+    "STATE_CHIANG_MAI",
+    "STATE_EAST_BORNEO",
+    "STATE_EAST_JAVA",
+    "STATE_KACHIN",
+    "STATE_LAOS",
+    "STATE_LUZON",
+    "STATE_MALAYA",
+    "STATE_MANDALAY",
+    "STATE_MEKONG",
+    "STATE_MINDANAO",
+    "STATE_MOLUCCAS",
+    "STATE_NAKHON_RATCHASIMA",
+    "STATE_NORTH_SUMATRA",
+    "STATE_PEGU",
+    "STATE_SHAN_STATES",
+    "STATE_SOUTH_SUMATRA",
+    "STATE_SUNDA_ISLANDS",
+    "STATE_TENASSERIM",
+    "STATE_TONKIN",
+    "STATE_VISAYAS",
+    "STATE_WESTERN_NEW_GUINEA",
+    "STATE_WEST_BORNEO",
+    "STATE_WEST_JAVA"
+  ],
+  "countries": [
+    "CHI"
+  ],
+  "sha256": {
+    "states.json": "4c73e9b52f6f47b569da4d16661f967cca8c010340a6162f1efd502e07e9b9b0",
+    "cultures.json": "521f106c0b675017295cede3389437d9b4b34bd997f2c840956f7f74c5379396",
+    "countries.json": "e314d7b07da4bc4cd5ad52c590165b2fd401109cd7f7acb7ebb04a26e940104d",
+    "journal_entries.json": "028f4f068e3710ea87a9d07fab862506f8f14c83e6c3adaa62435a3b3af17b28"
+  }
+}

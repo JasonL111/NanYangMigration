@@ -1,0 +1,16 @@
+{
+  ".metadata/metadata.json": "3bac2a3beca577e89ee9bcf186ffaca2a9d821a45c9185f193876258d567e368",
+  "README.md": "dfd00820cfd72b8edbe705a125fb2c72352cf486c034145c8c7e8f50a2af9d86",
+  "common/journal_entries/nanyang_journal.txt": "2867ce5ea31ea2567ee52ce19088f44e96f58855aecfed454520dffaf31ea4ab",
+  "common/script_values/nanyang_values.txt": "196921b5104520491a991d5e731c1a422bbbf6a82b641ef31c9d6f1ef15b512d",
+  "common/scripted_buttons/nanyang_buttons.txt": "52ef737a06d1f816b73efa54d21f2fab3ea28c31bf74a6522fe4597b53e8df0c",
+  "common/scripted_effects/nanyang_effects.txt": "d9cdde94801396415dca3723ca5fd4eb2490c1232350655a4c91e8a277b8416c",
+  "common/scripted_triggers/nanyang_triggers.txt": "8852219c436bf8a94fc7e4c8c3bdf8e19f9e2217989faed7e7a2d4a673cb0bf6",
+  "docs/VALIDATION.md": "bf2c15dd27aadc56cca21678943b45e8ddc5adeb4365544a0793fc853ac6d355",
+  "docs/design.json": "dd0355d4330d6547a9146200f9a800e83427ff06eaa5bcf96dad2f0643feda7c",
+  "docs/reference_ids.json": "dcc77d05d1e6a8c1e347f1af466dd7512d29d4acf95e2067af84a6ea07a89db6",
+  "docs/test-results.txt": "1ee640da1cf47f5cb8e3ef9652a75ca815e868aef01df240ecfd894fa13e0f8c",
+  "events/nanyang_events.txt": "061e9a343ecc7d93361d239d8024bce40526123fedef2123c4a448bfdc8917f7",
+  "localization/english/nanyang_l_english.yml": "c75571484d5c70f0b0a839d1fde7c803b6d4cf296b827decd204ec131512cc7c",
+  "localization/simp_chinese/nanyang_l_simp_chinese.yml": "7a107f446e3620ce63f4237459375f4a0e5f5f20bc65ee4d4d61cdcc88e231a2"
+}

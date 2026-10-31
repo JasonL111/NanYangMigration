@@ -1,0 +1,12 @@
+﻿l_simp_chinese:
+ je_nanyang_migration:0 "下南洋"
+ je_nanyang_migration_reason:0 "自闽粤沿海至南洋诸邦，华人远渡重洋、经商谋生，渐成海外聚落。国家可以组织大规模移民，使闽人、粤人、客家人与汉人迁往东南亚，在异域建立新的家园。\n\n累计成功：[GetPlayer.MakeScope.ScriptValue('nym_uses')|0] 次；本次计划：[GetPlayer.MakeScope.ScriptValue('nym_target')|0] 人。\n上次计划：[GetPlayer.MakeScope.ScriptValue('nym_last_target')|0] 人；上次实际完成：[GetPlayer.MakeScope.ScriptValue('nym_last')|0] 人。\n本次成功后的下一次目标：[GetPlayer.MakeScope.ScriptValue('nym_following_target')|0] 人。冷却状态请查看按钮条件；成功后须等待5个游戏年。"
+ nym_organize_name:0 "组织下南洋"
+ nym_organize_desc:0 "本次计划迁移 [GetPlayer.MakeScope.ScriptValue('nym_target')|0] 人。来源为本国所有拥有的州，不设省份限制。\n文化总比例：闽45%、粤30%、客家15%、汉10%。\n目的地：马来亚及新加坡35%、荷属东印度25%、暹罗20%、印度支那12%、菲律宾5%、缅甸3%。按固定交叉矩阵执行；州内不设子地区权重，实际州等额分配并补整数余数。\n成功后冷却5年，下一次增加25%，上限500万人。人口或有效目的地不足时仅完成可行部分；零迁移不扣次数与冷却。"
+ nym_cooldown_tt:0 "距离上一次成功组织下南洋已满5个游戏年（首次无需等待）"
+ nym_attempt_tt:0 "立即按固定文化与地理矩阵组织真实人口迁移；完成量见结果通知。"
+ nym_success_title:0 "南洋的新家园"
+ nym_success_desc:0 "本次目标：[GetPlayer.MakeScope.ScriptValue('nym_last_target')|0] 人。\n实际迁移：[GetPlayer.MakeScope.ScriptValue('nym_last')|0] 人。\n累计成功：[GetPlayer.MakeScope.ScriptValue('nym_uses')|0] 次。下次目标：[GetPlayer.MakeScope.ScriptValue('nym_target')|0] 人。\n已进入5年冷却。人口不足或目的地不可用的份额不会用其他文化或地区补足。移民保留文化与宗教，抵达后按原生规则失业或转职。"
+ nym_failure_title:0 "航程未能启行"
+ nym_failure_desc:0 "没有实际转移任何人口。可能缺少四种文化的可迁移人口、有效目的州，或来源与目的相同。此次未增加成功次数，也未消耗冷却；上一次成功记录保持不变。"
+ nym_ack:0 "知悉"

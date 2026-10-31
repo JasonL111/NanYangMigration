@@ -1,0 +1,191 @@
+# All counts are persons, not workforce. Explicit schedule avoids iterative rounding drift.
+nym_uses = {
+    value = 0
+    if = { limit = { has_global_variable = nym_uses } value = global_var:nym_uses }
+}
+nym_last = {
+    value = 0
+    if = { limit = { has_global_variable = nym_last } value = global_var:nym_last }
+}
+nym_last_target = {
+    value = 0
+    if = { limit = { has_global_variable = nym_last_target } value = global_var:nym_last_target }
+}
+nym_target = {
+    value = 5000000
+    if = { limit = { nym_uses = 0 } value = 2000000 }
+    else_if = { limit = { nym_uses = 1 } value = 2500000 }
+    else_if = { limit = { nym_uses = 2 } value = 3125000 }
+    else_if = { limit = { nym_uses = 3 } value = 3906250 }
+    else_if = { limit = { nym_uses = 4 } value = 4882813 }
+}
+nym_following_target = {
+    value = 5000000
+    if = { limit = { nym_uses = 0 } value = 2500000 }
+    else_if = { limit = { nym_uses = 1 } value = 3125000 }
+    else_if = { limit = { nym_uses = 2 } value = 3906250 }
+    else_if = { limit = { nym_uses = 3 } value = 4882813 }
+    else_if = { limit = { nym_uses = 4 } value = 5000000 }
+}
+nym_plan_malaya_min = {
+    value = 600000
+    if = { limit = { nym_uses = 0 } value = 240000 }
+    else_if = { limit = { nym_uses = 1 } value = 300000 }
+    else_if = { limit = { nym_uses = 2 } value = 375000 }
+    else_if = { limit = { nym_uses = 3 } value = 468750 }
+    else_if = { limit = { nym_uses = 4 } value = 585938 }
+}
+nym_plan_malaya_yue = {
+    value = 500000
+    if = { limit = { nym_uses = 0 } value = 200000 }
+    else_if = { limit = { nym_uses = 1 } value = 250000 }
+    else_if = { limit = { nym_uses = 2 } value = 312500 }
+    else_if = { limit = { nym_uses = 3 } value = 390625 }
+    else_if = { limit = { nym_uses = 4 } value = 488281 }
+}
+nym_plan_malaya_hakka = {
+    value = 350000
+    if = { limit = { nym_uses = 0 } value = 140000 }
+    else_if = { limit = { nym_uses = 1 } value = 175000 }
+    else_if = { limit = { nym_uses = 2 } value = 218750 }
+    else_if = { limit = { nym_uses = 3 } value = 273438 }
+    else_if = { limit = { nym_uses = 4 } value = 341797 }
+}
+nym_plan_malaya_han = {
+    value = 300000
+    if = { limit = { nym_uses = 0 } value = 120000 }
+    else_if = { limit = { nym_uses = 1 } value = 150000 }
+    else_if = { limit = { nym_uses = 2 } value = 187500 }
+    else_if = { limit = { nym_uses = 3 } value = 234375 }
+    else_if = { limit = { nym_uses = 4 } value = 292969 }
+}
+nym_plan_east_indies_min = {
+    value = 650000
+    if = { limit = { nym_uses = 0 } value = 260000 }
+    else_if = { limit = { nym_uses = 1 } value = 325000 }
+    else_if = { limit = { nym_uses = 2 } value = 406250 }
+    else_if = { limit = { nym_uses = 3 } value = 507813 }
+    else_if = { limit = { nym_uses = 4 } value = 634766 }
+}
+nym_plan_east_indies_yue = {
+    value = 200000
+    if = { limit = { nym_uses = 0 } value = 80000 }
+    else_if = { limit = { nym_uses = 1 } value = 100000 }
+    else_if = { limit = { nym_uses = 2 } value = 125000 }
+    else_if = { limit = { nym_uses = 3 } value = 156250 }
+    else_if = { limit = { nym_uses = 4 } value = 195313 }
+}
+nym_plan_east_indies_hakka = {
+    value = 300000
+    if = { limit = { nym_uses = 0 } value = 120000 }
+    else_if = { limit = { nym_uses = 1 } value = 150000 }
+    else_if = { limit = { nym_uses = 2 } value = 187500 }
+    else_if = { limit = { nym_uses = 3 } value = 234375 }
+    else_if = { limit = { nym_uses = 4 } value = 292969 }
+}
+nym_plan_east_indies_han = {
+    value = 100000
+    if = { limit = { nym_uses = 0 } value = 40000 }
+    else_if = { limit = { nym_uses = 1 } value = 50000 }
+    else_if = { limit = { nym_uses = 2 } value = 62500 }
+    else_if = { limit = { nym_uses = 3 } value = 78125 }
+    else_if = { limit = { nym_uses = 4 } value = 97656 }
+}
+nym_plan_siam_min = {
+    value = 700000
+    if = { limit = { nym_uses = 0 } value = 280000 }
+    else_if = { limit = { nym_uses = 1 } value = 350000 }
+    else_if = { limit = { nym_uses = 2 } value = 437500 }
+    else_if = { limit = { nym_uses = 3 } value = 546875 }
+    else_if = { limit = { nym_uses = 4 } value = 683594 }
+}
+nym_plan_siam_yue = {
+    value = 150000
+    if = { limit = { nym_uses = 0 } value = 60000 }
+    else_if = { limit = { nym_uses = 1 } value = 75000 }
+    else_if = { limit = { nym_uses = 2 } value = 93750 }
+    else_if = { limit = { nym_uses = 3 } value = 117188 }
+    else_if = { limit = { nym_uses = 4 } value = 146484 }
+}
+nym_plan_siam_hakka = {
+    value = 50000
+    if = { limit = { nym_uses = 0 } value = 20000 }
+    else_if = { limit = { nym_uses = 1 } value = 25000 }
+    else_if = { limit = { nym_uses = 2 } value = 31250 }
+    else_if = { limit = { nym_uses = 3 } value = 39063 }
+    else_if = { limit = { nym_uses = 4 } value = 48828 }
+}
+nym_plan_siam_han = {
+    value = 100000
+    if = { limit = { nym_uses = 0 } value = 40000 }
+    else_if = { limit = { nym_uses = 1 } value = 50000 }
+    else_if = { limit = { nym_uses = 2 } value = 62500 }
+    else_if = { limit = { nym_uses = 3 } value = 78125 }
+    else_if = { limit = { nym_uses = 4 } value = 97656 }
+}
+nym_plan_indochina_min = {
+    value = 100000
+    if = { limit = { nym_uses = 0 } value = 40000 }
+    else_if = { limit = { nym_uses = 1 } value = 50000 }
+    else_if = { limit = { nym_uses = 2 } value = 62500 }
+    else_if = { limit = { nym_uses = 3 } value = 78125 }
+    else_if = { limit = { nym_uses = 4 } value = 97656 }
+}
+nym_plan_indochina_yue = {
+    value = 450000
+    if = { limit = { nym_uses = 0 } value = 180000 }
+    else_if = { limit = { nym_uses = 1 } value = 225000 }
+    else_if = { limit = { nym_uses = 2 } value = 281250 }
+    else_if = { limit = { nym_uses = 3 } value = 351562 }
+    else_if = { limit = { nym_uses = 4 } value = 439453 }
+}
+nym_plan_indochina_hakka = {
+    value = 50000
+    if = { limit = { nym_uses = 0 } value = 20000 }
+    else_if = { limit = { nym_uses = 1 } value = 25000 }
+    else_if = { limit = { nym_uses = 2 } value = 31250 }
+    else_if = { limit = { nym_uses = 3 } value = 39062 }
+    else_if = { limit = { nym_uses = 4 } value = 48828 }
+}
+nym_plan_philippines_min = {
+    value = 200000
+    if = { limit = { nym_uses = 0 } value = 80000 }
+    else_if = { limit = { nym_uses = 1 } value = 100000 }
+    else_if = { limit = { nym_uses = 2 } value = 125000 }
+    else_if = { limit = { nym_uses = 3 } value = 156250 }
+    else_if = { limit = { nym_uses = 4 } value = 195313 }
+}
+nym_plan_philippines_yue = {
+    value = 50000
+    if = { limit = { nym_uses = 0 } value = 20000 }
+    else_if = { limit = { nym_uses = 1 } value = 25000 }
+    else_if = { limit = { nym_uses = 2 } value = 31250 }
+    else_if = { limit = { nym_uses = 3 } value = 39062 }
+    else_if = { limit = { nym_uses = 4 } value = 48828 }
+}
+nym_plan_burma_yue = {
+    value = 150000
+    if = { limit = { nym_uses = 0 } value = 60000 }
+    else_if = { limit = { nym_uses = 1 } value = 75000 }
+    else_if = { limit = { nym_uses = 2 } value = 93750 }
+    else_if = { limit = { nym_uses = 3 } value = 117187 }
+    else_if = { limit = { nym_uses = 4 } value = 146484 }
+}
+
+# Pop scope: cap against the click-time balance, live population and destination quota.
+nym_take = {
+    value = total_size
+    min = var:nym_available
+    min = scope:nym_country.var:nym_quota
+    floor = yes
+}
+nym_state_share = {
+    value = var:nym_cell_unassigned
+    divide = var:nym_states_left
+    floor = yes
+}
+nym_destination_delta = {
+    value = scope:nym_destination.state_population
+    subtract = var:nym_before
+    max = 0
+}

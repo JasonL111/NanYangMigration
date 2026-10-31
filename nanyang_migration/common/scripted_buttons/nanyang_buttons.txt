@@ -1,0 +1,22 @@
+nym_organize = {
+    name = nym_organize_name
+    desc = nym_organize_desc
+    visible = { nym_eligible = yes }
+    possible = {
+        nym_eligible = yes
+        custom_tooltip = {
+            text = nym_cooldown_tt
+            NOT = { has_global_variable = nym_cooldown }
+        }
+    }
+    ai_chance = { value = 0 }
+    effect = {
+        # Timed persistent variable rather than unconditional button cooldown:
+        # zero-move attempts must not consume cooldown; successor countries share it.
+        if = {
+            limit = { nym_eligible = yes NOT = { has_global_variable = nym_cooldown } }
+            hidden_effect = { nym_execute = yes }
+            custom_tooltip = nym_attempt_tt
+        }
+    }
+}

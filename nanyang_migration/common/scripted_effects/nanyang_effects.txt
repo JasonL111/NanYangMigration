@@ -1,0 +1,139 @@
+# Only executed on a player click; no periodic pop scans.
+nym_execute = {
+    save_scope_as = nym_country
+    if = {
+        limit = { NOT = { has_global_variable = nym_uses } }
+        set_global_variable = { name = nym_uses value = 0 }
+    }
+    set_variable = { name = nym_requested value = nym_target }
+    set_variable = { name = nym_actual value = 0 }
+    # Snapshot the source objects and their pre-migration balance. Newly created
+    # arrival objects are never added. Existing arrival objects cannot expand balances.
+    every_scope_pop = {
+        limit = { nym_culture = yes total_size >= 1 }
+        set_variable = { name = nym_available value = total_size }
+        set_variable = { name = nym_origin value = state }
+        add_to_list = nym_sources
+    }
+    set_variable = { name = nym_count_malaya value = 0 }
+    every_state = {
+        limit = { nym_region_malaya = yes }
+        add_to_list = nym_dest_malaya
+        scope:nym_country = { change_variable = { name = nym_count_malaya add = 1 } }
+    }
+    set_variable = { name = nym_count_east_indies value = 0 }
+    every_state = {
+        limit = { nym_region_east_indies = yes }
+        add_to_list = nym_dest_east_indies
+        scope:nym_country = { change_variable = { name = nym_count_east_indies add = 1 } }
+    }
+    set_variable = { name = nym_count_siam value = 0 }
+    every_state = {
+        limit = { nym_region_siam = yes }
+        add_to_list = nym_dest_siam
+        scope:nym_country = { change_variable = { name = nym_count_siam add = 1 } }
+    }
+    set_variable = { name = nym_count_indochina value = 0 }
+    every_state = {
+        limit = { nym_region_indochina = yes }
+        add_to_list = nym_dest_indochina
+        scope:nym_country = { change_variable = { name = nym_count_indochina add = 1 } }
+    }
+    set_variable = { name = nym_count_philippines value = 0 }
+    every_state = {
+        limit = { nym_region_philippines = yes }
+        add_to_list = nym_dest_philippines
+        scope:nym_country = { change_variable = { name = nym_count_philippines add = 1 } }
+    }
+    set_variable = { name = nym_count_burma value = 0 }
+    every_state = {
+        limit = { nym_region_burma = yes }
+        add_to_list = nym_dest_burma
+        scope:nym_country = { change_variable = { name = nym_count_burma add = 1 } }
+    }
+    nym_run_cell = { REGION = malaya CULTURE = min AMOUNT = nym_plan_malaya_min }
+    nym_run_cell = { REGION = malaya CULTURE = yue AMOUNT = nym_plan_malaya_yue }
+    nym_run_cell = { REGION = malaya CULTURE = hakka AMOUNT = nym_plan_malaya_hakka }
+    nym_run_cell = { REGION = malaya CULTURE = han AMOUNT = nym_plan_malaya_han }
+    nym_run_cell = { REGION = east_indies CULTURE = min AMOUNT = nym_plan_east_indies_min }
+    nym_run_cell = { REGION = east_indies CULTURE = yue AMOUNT = nym_plan_east_indies_yue }
+    nym_run_cell = { REGION = east_indies CULTURE = hakka AMOUNT = nym_plan_east_indies_hakka }
+    nym_run_cell = { REGION = east_indies CULTURE = han AMOUNT = nym_plan_east_indies_han }
+    nym_run_cell = { REGION = siam CULTURE = min AMOUNT = nym_plan_siam_min }
+    nym_run_cell = { REGION = siam CULTURE = yue AMOUNT = nym_plan_siam_yue }
+    nym_run_cell = { REGION = siam CULTURE = hakka AMOUNT = nym_plan_siam_hakka }
+    nym_run_cell = { REGION = siam CULTURE = han AMOUNT = nym_plan_siam_han }
+    nym_run_cell = { REGION = indochina CULTURE = min AMOUNT = nym_plan_indochina_min }
+    nym_run_cell = { REGION = indochina CULTURE = yue AMOUNT = nym_plan_indochina_yue }
+    nym_run_cell = { REGION = indochina CULTURE = hakka AMOUNT = nym_plan_indochina_hakka }
+    nym_run_cell = { REGION = philippines CULTURE = min AMOUNT = nym_plan_philippines_min }
+    nym_run_cell = { REGION = philippines CULTURE = yue AMOUNT = nym_plan_philippines_yue }
+    nym_run_cell = { REGION = burma CULTURE = yue AMOUNT = nym_plan_burma_yue }
+    every_in_list = {
+        list = nym_sources
+        remove_variable = nym_available
+        remove_variable = nym_origin
+    }
+    if = {
+        limit = { var:nym_actual > 0 }
+        set_global_variable = { name = nym_last value = var:nym_actual }
+        set_global_variable = { name = nym_last_target value = var:nym_requested }
+        change_global_variable = { name = nym_uses add = 1 }
+        set_global_variable = { name = nym_cooldown value = yes years = 5 }
+        trigger_event = { id = nanyang_migration.1 }
+    }
+    else = { trigger_event = { id = nanyang_migration.2 } }
+}
+
+# Country scope. Each nonzero matrix cell has its own unalterable budget.
+# Missing regions are skipped; shortages never spill into another cell/culture.
+nym_run_cell = {
+    set_variable = { name = nym_cell_unassigned value = $AMOUNT$ }
+    set_variable = { name = nym_states_left value = var:nym_count_$REGION$ }
+    set_variable = { name = nym_cell_actual value = 0 }
+    every_in_list = {
+        list = nym_dest_$REGION$
+        save_scope_as = nym_destination
+        scope:nym_country = {
+            set_variable = { name = nym_quota value = nym_state_share }
+            change_variable = { name = nym_cell_unassigned subtract = var:nym_quota }
+            change_variable = { name = nym_states_left subtract = 1 }
+            every_in_list = {
+                list = nym_sources
+                limit = {
+                    culture = cu:$CULTURE$
+                    has_variable = nym_available
+                    var:nym_available >= 1
+                    total_size >= 1
+                    state = var:nym_origin
+                    state.owner = scope:nym_country
+                    NOT = { state = scope:nym_destination }
+                    scope:nym_country.var:nym_quota >= 1
+                }
+                nym_transfer = yes
+            }
+        }
+    }
+    # Per-cell actuals persist in the save for audit/debugging.
+    set_global_variable = { name = nym_actual_$REGION$_$CULTURE$ value = var:nym_cell_actual }
+}
+
+# Pop scope. Debit before moving: native movement may delete or merge this pop.
+# Record destination population delta, never the requested amount, as actual.
+nym_transfer = {
+    save_scope_value_as = { name = nym_amount value = nym_take }
+    if = {
+        limit = { scope:nym_amount >= 1 }
+        change_variable = { name = nym_available subtract = scope:nym_amount }
+        scope:nym_country = {
+            set_variable = { name = nym_before value = scope:nym_destination.state_population }
+        }
+        move_partial_pop = { state = scope:nym_destination population = scope:nym_amount }
+        scope:nym_country = {
+            set_variable = { name = nym_delta value = nym_destination_delta }
+            change_variable = { name = nym_actual add = var:nym_delta }
+            change_variable = { name = nym_cell_actual add = var:nym_delta }
+            change_variable = { name = nym_quota subtract = var:nym_delta }
+        }
+    }
+}

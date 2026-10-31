@@ -1,0 +1,15 @@
+namespace = nanyang_migration
+nanyang_migration.1 = {
+    type = country_event
+    title = nym_success_title
+    desc = nym_success_desc
+    is_popup = yes
+    option = { name = nym_ack }
+}
+nanyang_migration.2 = {
+    type = country_event
+    title = nym_failure_title
+    desc = nym_failure_desc
+    is_popup = yes
+    option = { name = nym_ack }
+}

@@ -1,0 +1,11 @@
+je_nanyang_migration = {
+    group = je_group_foreign_affairs
+    should_be_pinned_by_default_involved = yes
+    transferable = no
+    can_revolution_inherit = yes
+    is_shown_when_inactive = { nym_eligible = yes }
+    possible = { nym_eligible = yes }
+    complete = { always = no }
+    fail = { always = no }
+    scripted_button = nym_organize
+}

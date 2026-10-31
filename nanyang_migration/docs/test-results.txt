@@ -1,0 +1,29 @@
+Synthetic script-harness / static checks; NOT a Victoria 3 engine run.
+test_ai_disabled (test_mod.Execution.test_ai_disabled) ... ok
+test_cooldown_reload_successor_and_resume (test_mod.Execution.test_cooldown_reload_successor_and_resume) ... ok
+test_culture_shortage_no_substitution (test_mod.Execution.test_culture_shortage_no_substitution) ... ok
+test_destination_ownership_irrelevant (test_mod.Execution.test_destination_ownership_irrelevant) ... ok
+test_failure_preserves_last_success (test_mod.Execution.test_failure_preserves_last_success) ... ok
+test_full_transfer_and_matrix_all_six_levels (test_mod.Execution.test_full_transfer_and_matrix_all_six_levels) ... ok
+test_limited_source_never_negative (test_mod.Execution.test_limited_source_never_negative) ... ok
+test_missing_region_no_redistribution (test_mod.Execution.test_missing_region_no_redistribution) ... ok
+test_religion_preserved (test_mod.Execution.test_religion_preserved) ... ok
+test_same_state_and_preexisting_arrival_budget (test_mod.Execution.test_same_state_and_preexisting_arrival_budget) ... ok
+test_source_region_unrestricted (test_mod.Execution.test_source_region_unrestricted) ... ok
+test_split_states_equal_and_integer_remainders (test_mod.Execution.test_split_states_equal_and_integer_remainders) ... ok
+test_zero_no_use_or_cooldown (test_mod.Execution.test_zero_no_use_or_cooldown) ... ok
+test_all_scripts_parse_and_no_empty_files (test_mod.Files.test_all_scripts_parse_and_no_empty_files) ... ok
+test_definition_references (test_mod.Files.test_definition_references) ... ok
+test_localizations (test_mod.Files.test_localizations) ... ok
+test_metadata (test_mod.Files.test_metadata) ... ok
+test_native_timer_and_permanent_journal (test_mod.Files.test_native_timer_and_permanent_journal) ... ok
+test_no_fake_population_creation (test_mod.Files.test_no_fake_population_creation) ... ok
+test_versioned_identifiers (test_mod.Files.test_versioned_identifiers) ... ok
+test_growth_from_actual_script_values (test_mod.Mathematics.test_growth_from_actual_script_values) ... ok
+test_matrix (test_mod.Mathematics.test_matrix) ... ok
+test_rounding_from_emitted_values (test_mod.Mathematics.test_rounding_from_emitted_values) ... ok
+
+----------------------------------------------------------------------
+Ran 23 tests in 0.245s
+
+OK

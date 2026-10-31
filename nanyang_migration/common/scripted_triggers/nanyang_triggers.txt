@@ -1,0 +1,75 @@
+# Country eligibility follows CHI definitions, civil-war origin and vanilla central-government scope.
+nym_eligible = {
+    is_player = yes
+    OR = {
+        country_definition = cd:CHI
+        AND = {
+            exists = civil_war_origin_country
+            civil_war_origin_country = { country_definition = cd:CHI }
+        }
+        global_var:chinese_central_government ?= this
+    }
+}
+nym_culture = {
+    OR = { culture = cu:min culture = cu:yue culture = cu:hakka culture = cu:han }
+}
+nym_region_malaya = {
+    exists = owner
+    OR = {
+        state_region = s:STATE_MALAYA
+    }
+}
+nym_region_east_indies = {
+    exists = owner
+    OR = {
+        state_region = s:STATE_ACEH
+        state_region = s:STATE_NORTH_SUMATRA
+        state_region = s:STATE_SOUTH_SUMATRA
+        state_region = s:STATE_WEST_JAVA
+        state_region = s:STATE_CENTRAL_JAVA
+        state_region = s:STATE_EAST_JAVA
+        state_region = s:STATE_WEST_BORNEO
+        state_region = s:STATE_EAST_BORNEO
+        state_region = s:STATE_CELEBES
+        state_region = s:STATE_MOLUCCAS
+        state_region = s:STATE_SUNDA_ISLANDS
+        state_region = s:STATE_WESTERN_NEW_GUINEA
+    }
+}
+nym_region_siam = {
+    exists = owner
+    OR = {
+        state_region = s:STATE_BANGKOK
+        state_region = s:STATE_CHIANG_MAI
+        state_region = s:STATE_NAKHON_RATCHASIMA
+    }
+}
+nym_region_indochina = {
+    exists = owner
+    OR = {
+        state_region = s:STATE_TONKIN
+        state_region = s:STATE_ANNAM
+        state_region = s:STATE_MEKONG
+        state_region = s:STATE_CAMBODIA
+        state_region = s:STATE_LAOS
+    }
+}
+nym_region_philippines = {
+    exists = owner
+    OR = {
+        state_region = s:STATE_LUZON
+        state_region = s:STATE_VISAYAS
+        state_region = s:STATE_MINDANAO
+    }
+}
+nym_region_burma = {
+    exists = owner
+    OR = {
+        state_region = s:STATE_ARAKAN
+        state_region = s:STATE_PEGU
+        state_region = s:STATE_MANDALAY
+        state_region = s:STATE_KACHIN
+        state_region = s:STATE_SHAN_STATES
+        state_region = s:STATE_TENASSERIM
+    }
+}
