@@ -1,0 +1,71 @@
+nyp_button_literal = {
+    name = nyp_label_literal
+    desc = nyp_button_desc
+    visible = { is_player = yes country_definition = cd:CHI }
+    possible = { NOT = { has_global_variable = nyp_started } }
+    ai_chance = { base = 0 }
+    effect = {
+        if = {
+            limit = {
+                is_player = yes country_definition = cd:CHI
+                NOT = { has_global_variable = nyp_started }
+            }
+            hidden_effect = { nyp_test_literal = yes }
+            custom_tooltip = nyp_button_desc
+        }
+    }
+}
+
+nyp_button_dynamic = {
+    name = nyp_label_dynamic
+    desc = nyp_button_desc
+    visible = { is_player = yes country_definition = cd:CHI }
+    possible = { NOT = { has_global_variable = nyp_started } }
+    ai_chance = { base = 0 }
+    effect = {
+        if = {
+            limit = {
+                is_player = yes country_definition = cd:CHI
+                NOT = { has_global_variable = nyp_started }
+            }
+            hidden_effect = { nyp_test_dynamic = yes }
+            custom_tooltip = nyp_button_desc
+        }
+    }
+}
+
+nyp_button_ratio = {
+    name = nyp_label_ratio
+    desc = nyp_button_desc
+    visible = { is_player = yes country_definition = cd:CHI }
+    possible = { NOT = { has_global_variable = nyp_started } }
+    ai_chance = { base = 0 }
+    effect = {
+        if = {
+            limit = {
+                is_player = yes country_definition = cd:CHI
+                NOT = { has_global_variable = nyp_started }
+            }
+            hidden_effect = { nyp_test_ratio = yes }
+            custom_tooltip = nyp_button_desc
+        }
+    }
+}
+
+nyp_button_whole = {
+    name = nyp_label_whole
+    desc = nyp_button_desc
+    visible = { is_player = yes country_definition = cd:CHI }
+    possible = { NOT = { has_global_variable = nyp_started } }
+    ai_chance = { base = 0 }
+    effect = {
+        if = {
+            limit = {
+                is_player = yes country_definition = cd:CHI
+                NOT = { has_global_variable = nyp_started }
+            }
+            hidden_effect = { nyp_test_whole = yes }
+            custom_tooltip = nyp_button_desc
+        }
+    }
+}

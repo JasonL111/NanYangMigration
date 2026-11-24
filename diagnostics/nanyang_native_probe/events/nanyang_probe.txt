@@ -1,0 +1,23 @@
+namespace = nanyang_native_probe
+nanyang_native_probe.1 = {
+    type = country_event
+    title = nyp_title_now
+    desc = nyp_now
+    is_popup = yes
+    option = { name = nyp_ack }
+}
+nanyang_native_probe.2 = {
+    type = country_event
+    immediate = { nyp_sample_day = yes }
+    title = nyp_title_day
+    desc = nyp_day
+    is_popup = yes
+    option = { name = nyp_ack }
+}
+nanyang_native_probe.3 = {
+    type = country_event
+    title = nyp_title_none
+    desc = nyp_none
+    is_popup = yes
+    option = { name = nyp_ack }
+}

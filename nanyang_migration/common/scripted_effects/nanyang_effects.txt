@@ -1,6 +1,7 @@
-# Only executed on a player click; no periodic pop scans.
+# One button execution, held under a save-wide lock through verification.
 nym_execute = {
     save_scope_as = nym_country
+    set_global_variable = { name = nym_pending value = yes }
     if = {
         limit = { NOT = { has_global_variable = nym_uses } }
         set_global_variable = { name = nym_uses value = 0 }
@@ -11,8 +12,11 @@ nym_execute = {
     set_variable = { name = nym_source_people value = 0 }
     set_variable = { name = nym_transfer_calls value = 0 }
     set_variable = { name = nym_transfer_requested value = 0 }
-    # Snapshot the source objects and their pre-migration balance. Newly created
-    # arrival objects are never added. Existing arrival objects cannot expand balances.
+    set_variable = { name = nym_stop value = no }
+    set_variable = { name = nym_last_request value = 0 }
+    set_variable = { name = nym_source_delta value = 0 }
+    set_variable = { name = nym_destination_delta value = 0 }
+    # Only POPs present at click time can donate. A later merge cannot raise their budget.
     every_scope_pop = {
         limit = { nym_culture = yes total_size >= 1 }
         set_variable = { name = nym_available value = total_size }
@@ -23,128 +27,532 @@ nym_execute = {
             change_variable = { name = nym_source_count add = 1 }
             change_variable = { name = nym_source_people add = scope:nym_source_size }
         }
+        if = { limit = { culture = cu:min } add_to_list = nym_sources_min }
+        if = { limit = { culture = cu:yue } add_to_list = nym_sources_yue }
+        if = { limit = { culture = cu:hakka } add_to_list = nym_sources_hakka }
+        if = { limit = { culture = cu:han } add_to_list = nym_sources_han }
     }
     set_variable = { name = nym_count_malaya value = 0 }
-    every_state = {
-        limit = { nym_region_malaya = yes }
-        add_to_list = nym_dest_malaya
-        scope:nym_country = { change_variable = { name = nym_count_malaya add = 1 } }
+    s:STATE_MALAYA ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_malaya
+            scope:nym_country = { change_variable = { name = nym_count_malaya add = 1 } }
+        }
     }
     set_variable = { name = nym_count_east_indies value = 0 }
-    every_state = {
-        limit = { nym_region_east_indies = yes }
-        add_to_list = nym_dest_east_indies
-        scope:nym_country = { change_variable = { name = nym_count_east_indies add = 1 } }
+    s:STATE_ACEH ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_east_indies
+            scope:nym_country = { change_variable = { name = nym_count_east_indies add = 1 } }
+        }
+    }
+    s:STATE_NORTH_SUMATRA ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_east_indies
+            scope:nym_country = { change_variable = { name = nym_count_east_indies add = 1 } }
+        }
+    }
+    s:STATE_SOUTH_SUMATRA ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_east_indies
+            scope:nym_country = { change_variable = { name = nym_count_east_indies add = 1 } }
+        }
+    }
+    s:STATE_WEST_JAVA ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_east_indies
+            scope:nym_country = { change_variable = { name = nym_count_east_indies add = 1 } }
+        }
+    }
+    s:STATE_CENTRAL_JAVA ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_east_indies
+            scope:nym_country = { change_variable = { name = nym_count_east_indies add = 1 } }
+        }
+    }
+    s:STATE_EAST_JAVA ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_east_indies
+            scope:nym_country = { change_variable = { name = nym_count_east_indies add = 1 } }
+        }
+    }
+    s:STATE_WEST_BORNEO ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_east_indies
+            scope:nym_country = { change_variable = { name = nym_count_east_indies add = 1 } }
+        }
+    }
+    s:STATE_EAST_BORNEO ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_east_indies
+            scope:nym_country = { change_variable = { name = nym_count_east_indies add = 1 } }
+        }
+    }
+    s:STATE_CELEBES ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_east_indies
+            scope:nym_country = { change_variable = { name = nym_count_east_indies add = 1 } }
+        }
+    }
+    s:STATE_MOLUCCAS ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_east_indies
+            scope:nym_country = { change_variable = { name = nym_count_east_indies add = 1 } }
+        }
+    }
+    s:STATE_SUNDA_ISLANDS ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_east_indies
+            scope:nym_country = { change_variable = { name = nym_count_east_indies add = 1 } }
+        }
+    }
+    s:STATE_WESTERN_NEW_GUINEA ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_east_indies
+            scope:nym_country = { change_variable = { name = nym_count_east_indies add = 1 } }
+        }
     }
     set_variable = { name = nym_count_siam value = 0 }
-    every_state = {
-        limit = { nym_region_siam = yes }
-        add_to_list = nym_dest_siam
-        scope:nym_country = { change_variable = { name = nym_count_siam add = 1 } }
+    s:STATE_BANGKOK ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_siam
+            scope:nym_country = { change_variable = { name = nym_count_siam add = 1 } }
+        }
+    }
+    s:STATE_CHIANG_MAI ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_siam
+            scope:nym_country = { change_variable = { name = nym_count_siam add = 1 } }
+        }
+    }
+    s:STATE_NAKHON_RATCHASIMA ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_siam
+            scope:nym_country = { change_variable = { name = nym_count_siam add = 1 } }
+        }
     }
     set_variable = { name = nym_count_indochina value = 0 }
-    every_state = {
-        limit = { nym_region_indochina = yes }
-        add_to_list = nym_dest_indochina
-        scope:nym_country = { change_variable = { name = nym_count_indochina add = 1 } }
+    s:STATE_TONKIN ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_indochina
+            scope:nym_country = { change_variable = { name = nym_count_indochina add = 1 } }
+        }
+    }
+    s:STATE_ANNAM ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_indochina
+            scope:nym_country = { change_variable = { name = nym_count_indochina add = 1 } }
+        }
+    }
+    s:STATE_MEKONG ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_indochina
+            scope:nym_country = { change_variable = { name = nym_count_indochina add = 1 } }
+        }
+    }
+    s:STATE_CAMBODIA ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_indochina
+            scope:nym_country = { change_variable = { name = nym_count_indochina add = 1 } }
+        }
+    }
+    s:STATE_LAOS ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_indochina
+            scope:nym_country = { change_variable = { name = nym_count_indochina add = 1 } }
+        }
     }
     set_variable = { name = nym_count_philippines value = 0 }
-    every_state = {
-        limit = { nym_region_philippines = yes }
-        add_to_list = nym_dest_philippines
-        scope:nym_country = { change_variable = { name = nym_count_philippines add = 1 } }
+    s:STATE_LUZON ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_philippines
+            scope:nym_country = { change_variable = { name = nym_count_philippines add = 1 } }
+        }
+    }
+    s:STATE_VISAYAS ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_philippines
+            scope:nym_country = { change_variable = { name = nym_count_philippines add = 1 } }
+        }
+    }
+    s:STATE_MINDANAO ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_philippines
+            scope:nym_country = { change_variable = { name = nym_count_philippines add = 1 } }
+        }
     }
     set_variable = { name = nym_count_burma value = 0 }
-    every_state = {
-        limit = { nym_region_burma = yes }
-        add_to_list = nym_dest_burma
-        scope:nym_country = { change_variable = { name = nym_count_burma add = 1 } }
+    s:STATE_ARAKAN ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_burma
+            scope:nym_country = { change_variable = { name = nym_count_burma add = 1 } }
+        }
     }
-    nym_run_cell = { REGION = malaya CULTURE = min AMOUNT = nym_plan_malaya_min }
-    nym_run_cell = { REGION = malaya CULTURE = yue AMOUNT = nym_plan_malaya_yue }
-    nym_run_cell = { REGION = malaya CULTURE = hakka AMOUNT = nym_plan_malaya_hakka }
-    nym_run_cell = { REGION = malaya CULTURE = han AMOUNT = nym_plan_malaya_han }
-    nym_run_cell = { REGION = east_indies CULTURE = min AMOUNT = nym_plan_east_indies_min }
-    nym_run_cell = { REGION = east_indies CULTURE = yue AMOUNT = nym_plan_east_indies_yue }
-    nym_run_cell = { REGION = east_indies CULTURE = hakka AMOUNT = nym_plan_east_indies_hakka }
-    nym_run_cell = { REGION = east_indies CULTURE = han AMOUNT = nym_plan_east_indies_han }
-    nym_run_cell = { REGION = siam CULTURE = min AMOUNT = nym_plan_siam_min }
-    nym_run_cell = { REGION = siam CULTURE = yue AMOUNT = nym_plan_siam_yue }
-    nym_run_cell = { REGION = siam CULTURE = hakka AMOUNT = nym_plan_siam_hakka }
-    nym_run_cell = { REGION = siam CULTURE = han AMOUNT = nym_plan_siam_han }
-    nym_run_cell = { REGION = indochina CULTURE = min AMOUNT = nym_plan_indochina_min }
-    nym_run_cell = { REGION = indochina CULTURE = yue AMOUNT = nym_plan_indochina_yue }
-    nym_run_cell = { REGION = indochina CULTURE = hakka AMOUNT = nym_plan_indochina_hakka }
-    nym_run_cell = { REGION = philippines CULTURE = min AMOUNT = nym_plan_philippines_min }
-    nym_run_cell = { REGION = philippines CULTURE = yue AMOUNT = nym_plan_philippines_yue }
-    nym_run_cell = { REGION = burma CULTURE = yue AMOUNT = nym_plan_burma_yue }
+    s:STATE_PEGU ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_burma
+            scope:nym_country = { change_variable = { name = nym_count_burma add = 1 } }
+        }
+    }
+    s:STATE_MANDALAY ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_burma
+            scope:nym_country = { change_variable = { name = nym_count_burma add = 1 } }
+        }
+    }
+    s:STATE_KACHIN ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_burma
+            scope:nym_country = { change_variable = { name = nym_count_burma add = 1 } }
+        }
+    }
+    s:STATE_SHAN_STATES ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_burma
+            scope:nym_country = { change_variable = { name = nym_count_burma add = 1 } }
+        }
+    }
+    s:STATE_TENASSERIM ?= {
+        every_scope_state = {
+            limit = { exists = owner }
+            add_to_list = nym_dest_burma
+            scope:nym_country = { change_variable = { name = nym_count_burma add = 1 } }
+        }
+    }
+    set_global_variable = { name = nym_actual_malaya_min value = 0 }
+    if = {
+        limit = { var:nym_stop = no var:nym_count_malaya > 0 }
+        nym_run_cell = {
+            AMOUNT = nym_plan_malaya_min
+            COUNT = var:nym_count_malaya
+            DESTINATIONS = nym_dest_malaya
+            CULTURE = cu:min
+            SOURCES = nym_sources_min
+            CELL_RECORD = nym_actual_malaya_min
+        }
+    }
+    set_global_variable = { name = nym_actual_malaya_yue value = 0 }
+    if = {
+        limit = { var:nym_stop = no var:nym_count_malaya > 0 }
+        nym_run_cell = {
+            AMOUNT = nym_plan_malaya_yue
+            COUNT = var:nym_count_malaya
+            DESTINATIONS = nym_dest_malaya
+            CULTURE = cu:yue
+            SOURCES = nym_sources_yue
+            CELL_RECORD = nym_actual_malaya_yue
+        }
+    }
+    set_global_variable = { name = nym_actual_malaya_hakka value = 0 }
+    if = {
+        limit = { var:nym_stop = no var:nym_count_malaya > 0 }
+        nym_run_cell = {
+            AMOUNT = nym_plan_malaya_hakka
+            COUNT = var:nym_count_malaya
+            DESTINATIONS = nym_dest_malaya
+            CULTURE = cu:hakka
+            SOURCES = nym_sources_hakka
+            CELL_RECORD = nym_actual_malaya_hakka
+        }
+    }
+    set_global_variable = { name = nym_actual_malaya_han value = 0 }
+    if = {
+        limit = { var:nym_stop = no var:nym_count_malaya > 0 }
+        nym_run_cell = {
+            AMOUNT = nym_plan_malaya_han
+            COUNT = var:nym_count_malaya
+            DESTINATIONS = nym_dest_malaya
+            CULTURE = cu:han
+            SOURCES = nym_sources_han
+            CELL_RECORD = nym_actual_malaya_han
+        }
+    }
+    set_global_variable = { name = nym_actual_east_indies_min value = 0 }
+    if = {
+        limit = { var:nym_stop = no var:nym_count_east_indies > 0 }
+        nym_run_cell = {
+            AMOUNT = nym_plan_east_indies_min
+            COUNT = var:nym_count_east_indies
+            DESTINATIONS = nym_dest_east_indies
+            CULTURE = cu:min
+            SOURCES = nym_sources_min
+            CELL_RECORD = nym_actual_east_indies_min
+        }
+    }
+    set_global_variable = { name = nym_actual_east_indies_yue value = 0 }
+    if = {
+        limit = { var:nym_stop = no var:nym_count_east_indies > 0 }
+        nym_run_cell = {
+            AMOUNT = nym_plan_east_indies_yue
+            COUNT = var:nym_count_east_indies
+            DESTINATIONS = nym_dest_east_indies
+            CULTURE = cu:yue
+            SOURCES = nym_sources_yue
+            CELL_RECORD = nym_actual_east_indies_yue
+        }
+    }
+    set_global_variable = { name = nym_actual_east_indies_hakka value = 0 }
+    if = {
+        limit = { var:nym_stop = no var:nym_count_east_indies > 0 }
+        nym_run_cell = {
+            AMOUNT = nym_plan_east_indies_hakka
+            COUNT = var:nym_count_east_indies
+            DESTINATIONS = nym_dest_east_indies
+            CULTURE = cu:hakka
+            SOURCES = nym_sources_hakka
+            CELL_RECORD = nym_actual_east_indies_hakka
+        }
+    }
+    set_global_variable = { name = nym_actual_east_indies_han value = 0 }
+    if = {
+        limit = { var:nym_stop = no var:nym_count_east_indies > 0 }
+        nym_run_cell = {
+            AMOUNT = nym_plan_east_indies_han
+            COUNT = var:nym_count_east_indies
+            DESTINATIONS = nym_dest_east_indies
+            CULTURE = cu:han
+            SOURCES = nym_sources_han
+            CELL_RECORD = nym_actual_east_indies_han
+        }
+    }
+    set_global_variable = { name = nym_actual_siam_min value = 0 }
+    if = {
+        limit = { var:nym_stop = no var:nym_count_siam > 0 }
+        nym_run_cell = {
+            AMOUNT = nym_plan_siam_min
+            COUNT = var:nym_count_siam
+            DESTINATIONS = nym_dest_siam
+            CULTURE = cu:min
+            SOURCES = nym_sources_min
+            CELL_RECORD = nym_actual_siam_min
+        }
+    }
+    set_global_variable = { name = nym_actual_siam_yue value = 0 }
+    if = {
+        limit = { var:nym_stop = no var:nym_count_siam > 0 }
+        nym_run_cell = {
+            AMOUNT = nym_plan_siam_yue
+            COUNT = var:nym_count_siam
+            DESTINATIONS = nym_dest_siam
+            CULTURE = cu:yue
+            SOURCES = nym_sources_yue
+            CELL_RECORD = nym_actual_siam_yue
+        }
+    }
+    set_global_variable = { name = nym_actual_siam_hakka value = 0 }
+    if = {
+        limit = { var:nym_stop = no var:nym_count_siam > 0 }
+        nym_run_cell = {
+            AMOUNT = nym_plan_siam_hakka
+            COUNT = var:nym_count_siam
+            DESTINATIONS = nym_dest_siam
+            CULTURE = cu:hakka
+            SOURCES = nym_sources_hakka
+            CELL_RECORD = nym_actual_siam_hakka
+        }
+    }
+    set_global_variable = { name = nym_actual_siam_han value = 0 }
+    if = {
+        limit = { var:nym_stop = no var:nym_count_siam > 0 }
+        nym_run_cell = {
+            AMOUNT = nym_plan_siam_han
+            COUNT = var:nym_count_siam
+            DESTINATIONS = nym_dest_siam
+            CULTURE = cu:han
+            SOURCES = nym_sources_han
+            CELL_RECORD = nym_actual_siam_han
+        }
+    }
+    set_global_variable = { name = nym_actual_indochina_min value = 0 }
+    if = {
+        limit = { var:nym_stop = no var:nym_count_indochina > 0 }
+        nym_run_cell = {
+            AMOUNT = nym_plan_indochina_min
+            COUNT = var:nym_count_indochina
+            DESTINATIONS = nym_dest_indochina
+            CULTURE = cu:min
+            SOURCES = nym_sources_min
+            CELL_RECORD = nym_actual_indochina_min
+        }
+    }
+    set_global_variable = { name = nym_actual_indochina_yue value = 0 }
+    if = {
+        limit = { var:nym_stop = no var:nym_count_indochina > 0 }
+        nym_run_cell = {
+            AMOUNT = nym_plan_indochina_yue
+            COUNT = var:nym_count_indochina
+            DESTINATIONS = nym_dest_indochina
+            CULTURE = cu:yue
+            SOURCES = nym_sources_yue
+            CELL_RECORD = nym_actual_indochina_yue
+        }
+    }
+    set_global_variable = { name = nym_actual_indochina_hakka value = 0 }
+    if = {
+        limit = { var:nym_stop = no var:nym_count_indochina > 0 }
+        nym_run_cell = {
+            AMOUNT = nym_plan_indochina_hakka
+            COUNT = var:nym_count_indochina
+            DESTINATIONS = nym_dest_indochina
+            CULTURE = cu:hakka
+            SOURCES = nym_sources_hakka
+            CELL_RECORD = nym_actual_indochina_hakka
+        }
+    }
+    set_global_variable = { name = nym_actual_philippines_min value = 0 }
+    if = {
+        limit = { var:nym_stop = no var:nym_count_philippines > 0 }
+        nym_run_cell = {
+            AMOUNT = nym_plan_philippines_min
+            COUNT = var:nym_count_philippines
+            DESTINATIONS = nym_dest_philippines
+            CULTURE = cu:min
+            SOURCES = nym_sources_min
+            CELL_RECORD = nym_actual_philippines_min
+        }
+    }
+    set_global_variable = { name = nym_actual_philippines_yue value = 0 }
+    if = {
+        limit = { var:nym_stop = no var:nym_count_philippines > 0 }
+        nym_run_cell = {
+            AMOUNT = nym_plan_philippines_yue
+            COUNT = var:nym_count_philippines
+            DESTINATIONS = nym_dest_philippines
+            CULTURE = cu:yue
+            SOURCES = nym_sources_yue
+            CELL_RECORD = nym_actual_philippines_yue
+        }
+    }
+    set_global_variable = { name = nym_actual_burma_yue value = 0 }
+    if = {
+        limit = { var:nym_stop = no var:nym_count_burma > 0 }
+        nym_run_cell = {
+            AMOUNT = nym_plan_burma_yue
+            COUNT = var:nym_count_burma
+            DESTINATIONS = nym_dest_burma
+            CULTURE = cu:yue
+            SOURCES = nym_sources_yue
+            CELL_RECORD = nym_actual_burma_yue
+        }
+    }
     every_in_list = {
         list = nym_sources
+        limit = { exists = this }
         remove_variable = nym_available
         remove_variable = nym_origin
     }
     if = {
+        limit = { var:nym_stop = yes }
+        # No safe automatic retry/attribution after an unverified native mutation.
+        trigger_event = { id = nanyang_migration.3 }
+    }
+    else_if = {
         limit = { var:nym_actual > 0 }
         set_global_variable = { name = nym_last value = var:nym_actual }
         set_global_variable = { name = nym_last_target value = var:nym_requested }
         change_global_variable = { name = nym_uses add = 1 }
         set_global_variable = { name = nym_cooldown value = yes years = 5 }
+        remove_global_variable = nym_pending
         trigger_event = { id = nanyang_migration.1 }
     }
-    else = { trigger_event = { id = nanyang_migration.2 } }
+    else = {
+        remove_global_variable = nym_pending
+        trigger_event = { id = nanyang_migration.2 }
+    }
 }
 
-# Country scope. Each nonzero matrix cell has its own unalterable budget.
-# Missing regions are skipped; shortages never spill into another cell/culture.
+# Country scope. Full-token parameters carry the exact references from the caller.
 nym_run_cell = {
+    set_variable = { name = nym_current_culture value = $CULTURE$ }
     set_variable = { name = nym_cell_unassigned value = $AMOUNT$ }
-    set_variable = { name = nym_states_left value = var:nym_count_$REGION$ }
+    set_variable = { name = nym_states_left value = $COUNT$ }
     set_variable = { name = nym_cell_actual value = 0 }
     every_in_list = {
-        list = nym_dest_$REGION$
+        list = $DESTINATIONS$
+        limit = { exists = owner scope:nym_country.var:nym_stop = no }
         save_scope_as = nym_destination
         scope:nym_country = {
             set_variable = { name = nym_quota value = nym_state_share }
             change_variable = { name = nym_cell_unassigned subtract = var:nym_quota }
             change_variable = { name = nym_states_left subtract = 1 }
             every_in_list = {
-                list = nym_sources
+                list = $SOURCES$
                 limit = {
-                    culture = cu:$CULTURE$
+                    scope:nym_country.var:nym_stop = no
+                    scope:nym_country.var:nym_quota >= 1
+                    exists = this
                     has_variable = nym_available
                     var:nym_available >= 1
                     total_size >= 1
                     state = var:nym_origin
-                    state.owner = scope:nym_country
+                    owner = scope:nym_country
                     NOT = { state = scope:nym_destination }
-                    scope:nym_country.var:nym_quota >= 1
                 }
                 nym_transfer = yes
             }
         }
     }
-    # Per-cell actuals persist in the save for audit/debugging.
-    set_global_variable = { name = nym_actual_$REGION$_$CULTURE$ value = var:nym_cell_actual }
+    set_global_variable = { name = $CELL_RECORD$ value = var:nym_cell_actual }
 }
 
-# Pop scope. Debit before moving: native movement may delete or merge this pop.
-# Record destination population delta, never the requested amount, as actual.
+# Pop scope on entry. After the native effect use only the saved country and states.
 nym_transfer = {
     save_scope_value_as = { name = nym_amount value = nym_take }
     if = {
         limit = { scope:nym_amount >= 1 }
+        state = { save_scope_as = nym_origin_state }
         change_variable = { name = nym_available subtract = scope:nym_amount }
         scope:nym_country = {
-            set_variable = { name = nym_before value = scope:nym_destination.state_population }
+            set_variable = { name = nym_source_before value = scope:nym_origin_state.nym_live_population }
+            set_variable = { name = nym_destination_before value = scope:nym_destination.nym_live_population }
+            set_variable = { name = nym_last_request value = scope:nym_amount }
             change_variable = { name = nym_transfer_calls add = 1 }
             change_variable = { name = nym_transfer_requested add = scope:nym_amount }
         }
         move_partial_pop = { state = scope:nym_destination population = scope:nym_amount }
         scope:nym_country = {
-            set_variable = { name = nym_delta value = nym_destination_delta }
-            change_variable = { name = nym_actual add = var:nym_delta }
-            change_variable = { name = nym_cell_actual add = var:nym_delta }
-            change_variable = { name = nym_quota subtract = var:nym_delta }
+            set_variable = { name = nym_source_delta value = nym_source_delta }
+            set_variable = { name = nym_destination_delta value = nym_destination_delta }
+            if = {
+                limit = {
+                    var:nym_source_delta > 0
+                    var:nym_source_delta = var:nym_destination_delta
+                    var:nym_destination_delta <= var:nym_last_request
+                }
+                change_variable = { name = nym_actual add = var:nym_destination_delta }
+                change_variable = { name = nym_cell_actual add = var:nym_destination_delta }
+                change_variable = { name = nym_quota subtract = var:nym_destination_delta }
+            }
+            else = { set_variable = { name = nym_stop value = yes } }
         }
     }
 }

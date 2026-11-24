@@ -1,0 +1,14 @@
+{
+  "name": "Nanyang Native POP Probe",
+  "id": "nanyang_native_probe",
+  "version": "1.1.0-rc.1",
+  "supported_game_version": "1.15.2",
+  "relationships": [],
+  "short_description": "Single small POP experiment for a disposable 1836 save.",
+  "tags": [
+    "Gameplay"
+  ],
+  "game_custom_data": {
+    "multiplayer_synchronized": true
+  }
+}

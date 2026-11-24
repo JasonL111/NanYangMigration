@@ -1,0 +1,19 @@
+nyp_live = {
+    value = 0
+    every_scope_pop = { limit = { culture = cu:min } add = total_size }
+}
+
+nyp_work = {
+    value = 0
+    every_scope_pop = { limit = { culture = cu:min } add = workforce }
+}
+
+nyp_deps = {
+    value = 0
+    every_scope_pop = { limit = { culture = cu:min } add = dependents }
+}
+
+nyp_objects = {
+    value = 0
+    every_scope_pop = { limit = { culture = cu:min } add = 1 }
+}

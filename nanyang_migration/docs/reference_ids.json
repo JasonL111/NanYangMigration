@@ -1,4 +1,18 @@
 {
+  "target_version": "1.15.2",
+  "target_game_data_status": "requires local snapshot",
+  "native_docs_source": "https://github.com/Victoria-3-Modding-Co-op/Modding-Digests",
+  "native_docs_commit": "0e94618d6a1b1599d4c78cc074282598de4d59b2",
+  "native_docs_sha256": {
+    "1.15.2/docs/effects.log": "cc2437ea67c4c6576602b4ffaaef910924030f091e5eb910f2d95c38157feed9",
+    "1.15.2/docs/triggers.log": "3d62511a7b16b51eb08eff2029616a47accf226a659518b946146a46735cfcf9",
+    "1.15.2/docs/event_targets.log": "2764b5d5eb82c6813a64f07424c69897c02a1adb6c0afe323ef50a133da6d04d",
+    "1.15.0/types/journal_entries.md": "a28e3f4cd37b381b40e787deb3342aa2518be87fa89176e213d235a6ed0eeff1",
+    "1.15.0/types/scripted_buttons.md": "596e62f265e277b5a7e9881d1f319ddea0af4189befc76eb9b96eba52a989b26",
+    "documentation/types/script_values.md": "66431f8e32c467a4b224b87a939189ee26c75ff1c6837f4966c6046cc67725a6",
+    "1.15.2/docs/event_scopes.log": "1d2cf50eacf22669cf1d2cdecf6625e4f3e19b47bd7d3c4a5cf0b32bdb28d7b8",
+    "1.15.2/docs/data_types_script.txt": "675bfe28053d2760f56e47b1d1f87100eda07eb730eaad5fcd0d8aa5916fe9c4"
+  },
   "version": "1.13.11 (Matcha)",
   "source": "https://github.com/alcaras/v3ref",
   "commit": "bd8e3f7da313a57d0509559d59cff7617cc49513",
