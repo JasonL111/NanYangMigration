@@ -227,6 +227,9 @@ class Harness:
                     raise ValueError('Invalid required scope: ' + key)
             elif key in ('set_variable', 'set_global_variable'):
                 store = self.globals if key == 'set_global_variable' else obj.vars
+                if not f:
+                    store[value] = True
+                    continue
                 store[f['name']] = self.resolve(f.get('value', 'yes'), obj)
                 if 'years' in f: self.durations[f['name']] = ('years', int(f['years']))
             elif key in ('change_variable', 'change_global_variable'):

@@ -13,12 +13,12 @@
 | `move_pop`，1.15.2 effects.log | POP → state，整 POP 原生移动。 | 不能满足任意分配额，正式流程继续使用部分移动。 |
 | `total_size` / `workforce` / `dependents` / `state_population`，1.15.2 triggers.log | POP 总大小、劳动力、家属分别有数值比较接口。State 有总人口比较接口。原生例 `total_size >= 3000`、`workforce >= 1000`、`dependents >= 2000`。 | 动态数值用途与样本来自类型文档及辅助 CWTools。正式读数用两州逐 POP 合计，避免直接以州总计缓存来结账。POP 合计的即时更新仍有待实测。 |
 | `every_scope_pop` / `random_scope_pop` / `every_scope_state` / `random_scope_state`，1.15.2 effects.log | Country/State 可遍历 POP；State Region 可遍历/随机选取实际 State。均支持 `limit`。原生 Script Value 模板明确支持迭代统计。 | 来源只收集一次；仅访问指定地理域。所有有拥有者的分割 State 都加入候选。安全枚举失效 POP 引用的引擎行为须实测。 |
-| `add_to_list` / `every_in_list`，1.15.2 effects.log | 原生例 `add_to_list = name`、`every_in_list = { list = name … }`。事件链内局部引用。 | 每次动作建立快照，列表在同一调用链使用。按文化分列表，转移后不把新对象加入。 |
+| `add_to_list` / `every_in_list`，1.15.2 effects.log | 原生例 `add_to_list = name`、`every_in_list = { list = name … }`。事件链内局部引用。 | RC1 的配对依赖该接口。RC2 改用原生实时枚举和原来源州标记，移动的 POP 或继承标记的拆分 POP 不能以落地州通过来源筛选。 |
 | `save_scope_as` / `save_scope_value_as`，1.15.2 effects.log | 保存任意当前 scope 或数值为 `scope:<key>`。Journal 原生模板展示保存引用与事件。 | 转移前保存国家、两州和请求量。调用移动后仅通过已保存的州/国家读取，不再依赖源 POP 的大小或位置。 |
 | `set_variable` / `change_variable` / 移除操作，1.15.2 effects.log / event_scopes.log | Country 和 POP 可存变量；`{ name = X value = Y }`，值可为 Script Value、Scope 或旗标。操作支持 `add`、`subtract`。 | 来源额度挂在原对象，记录和工作额度放国家。使用前检查变量和实际州。 |
 | `set_global_variable` / `change_global_variable` / `has_global_variable` / `remove_global_variable`，1.15.2 effects/triggers.log | 全局名与值；调用日志仅明确展示 `days`，持续时间块的 `years` 由 CWTools duration 定义辅助支持。 | 保留原版设计 `years = 5`，避免自行换算闰年。需要原生计时和存档重载验证。待确认锁没有自动到期。 |
 | Scope links，1.15.2 event_targets.log | `country_definition` Country → Definition、`civil_war_origin_country` Country → Country、`state` POP → State、`owner` POP/State → Country、`culture` POP → Culture，以及 `s:`、`cu:`、`cd:`、`scope:`、`var:`、`global_var:`。 | 保留 CHI、内战来源与中央政府三支。中央政府是原版脚本的变量名称，生成文档不能证明新版仍写入该名称。 |
-| 式值与脚本参数，1.15 类型文档 | `min` 下限、`max` 上限、`floor = yes`。运算逐项求值。 | 读取预计算矩阵额度并上下限截取，独立检查边界。子效果传入完整列表名、完整文化/数值引用，减少旧版字符串拼接的依赖。没有把模拟器的宏展开等同引擎编译。 |
+| 式值与脚本参数，1.15 类型文档 | `min` 下限、`max` 上限、`floor = yes`。运算逐项求值。 | 读取预计算矩阵额度并上下限截取，独立检查边界。RC2 由生成器写出固定文化和地区调用，配对过程不使用运行时脚本参数。停止标记由文档化的 `set_variable = name` / `has_variable = name` / `remove_variable = name` 管理。 |
 | Journal 和 Button，1.15 类型文档，1.15.2 conclude_journal_entry 增量 | Country context，`scripted_button` 指向按钮；零个 outcome 合法。Button 的 `visible`、`possible`、`effect`、`ai_chance = { base = 0 }` 有原生模板。 | 复用现有原版 group，明确 context、采用 country context 的 pin 字段。省略 outcome 与 timeout。执行入口再次核对资格、冷却和锁。 |
 | `trigger_event` / `custom_tooltip` / `hidden_effect`，1.15.2 effects.log；数据类型日志 | 事件可延迟 `days = 1`。可显示 Tooltip 并隐藏调度脚本。类型中有 `Scope.Var`、`ScriptValue`、`GetValue`、`TopScope.sState`。 | 正式操作三类结果。隔日事件仅用于独立探针，避免把隔日的自然变化结为迁移。游戏内验证弹窗的变量显示和事件作用域。 |
 
