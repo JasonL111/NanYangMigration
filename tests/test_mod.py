@@ -30,7 +30,7 @@ def world(uses=0, available=10_000_000, split=1, religion='confucian', move=imme
 class Files(unittest.TestCase):
     def test_metadata(self):
         d = json.loads((MOD/'.metadata/metadata.json').read_text())
-        self.assertEqual(d['version'], '1.1.0-rc.4')
+        self.assertEqual(d['version'], '1.1.0')
         self.assertEqual(d['supported_game_version'], '1.15.2')
 
     def test_all_scripts_parse_and_no_empty_files(self):
@@ -62,6 +62,13 @@ class Files(unittest.TestCase):
         for f in (MOD/'common/scripted_buttons').glob('*.txt'):
             required.update(re.findall(r'\b(?:text|custom_tooltip)\s*=\s*(nym_\w+)\b', f.read_text()))
         self.assertLessEqual(required, keys[0])
+        for lang, cooldown in [('english', '3 in-game years'), ('simp_chinese', '3 个游戏年')]:
+            s = (MOD/f'localization/{lang}/nanyang_l_{lang}.yml').read_text(encoding='utf-8-sig')
+            self.assertNotRegex(s, r'(?i)diagnostic|error\.log|source POP|\bRC[1-4]\b|诊断|来源POP数|同文化候选')
+            self.assertIn('200,000', s)
+            self.assertIn('500,000', s)
+            self.assertIn('25%', s)
+            self.assertIn(cooldown, s)
 
     def test_definition_references(self):
         h = Harness(MOD)
@@ -120,8 +127,8 @@ class Files(unittest.TestCase):
         self.assertEqual(j['context'], 'country')
         self.assertFalse({'complete', 'fail', 'invalid', 'outcome', 'timeout'} & j.keys())
         text = (MOD/'common/scripted_effects/nanyang_effects.txt').read_text()
-        self.assertIn('name = nym_cooldown value = yes years = 5', text)
-        self.assertNotIn('days = 1825', text)
+        self.assertIn('name = nym_cooldown value = yes years = 3', text)
+        self.assertNotIn('days = 1095', text)
         self.assertNotIn('on_weekly_pulse', text)
 
 class Mathematics(unittest.TestCase):
@@ -134,6 +141,10 @@ class Mathematics(unittest.TestCase):
         self.assertEqual(h.formula(parse('value = 100 max = 50 max = 20'), h.country), 20)
 
     def test_matrix(self):
+        self.assertEqual(list(MATRIX.values()), [
+            [12, 10, 7, 6], [13, 4, 6, 2], [14, 3, 1, 2],
+            [2, 9, 1, 0], [4, 1, 0, 0], [0, 3, 0, 0],
+        ])
         self.assertEqual([sum(row[i] for row in MATRIX.values()) for i in range(4)], [45,30,15,10])
         self.assertEqual([sum(row) for row in MATRIX.values()], [35,25,20,12,5,3])
         self.assertEqual(sum(w for _,_,w in CELLS), 100)
@@ -142,10 +153,11 @@ class Mathematics(unittest.TestCase):
         from decimal import Decimal, ROUND_HALF_UP
         h = Harness(MOD)
         for uses in range(20):
-            expected = min(int((Decimal(2_000_000)*Decimal('1.25')**uses).quantize(Decimal(1), rounding=ROUND_HALF_UP)), 5_000_000)
+            expected = min(int((Decimal(200_000)*Decimal('1.25')**uses).quantize(Decimal(1), rounding=ROUND_HALF_UP)), 500_000)
             h.globals['nym_uses'] = uses
             self.assertEqual(h.resolve('nym_target', h.country), expected)
-        self.assertEqual(TARGETS, [2000000,2500000,3125000,3906250,4882813,5000000])
+            self.assertEqual(h.resolve('nym_following_target', h.country), TARGETS[min(uses+1, 5)])
+        self.assertEqual(TARGETS, [200000, 250000, 312500, 390625, 488281, 500000])
 
     def test_rounding_from_emitted_values(self):
         h = Harness(MOD)
@@ -183,8 +195,8 @@ class Execution(unittest.TestCase):
         self.assertGreaterEqual(values['nym_transfer_calls'], values['nym_positive_shares'])
         self.assertEqual(values['nym_culture_candidates'], values['nym_source_matches'])
         self.assertEqual(values['nym_source_matches'], values['nym_transfer_calls'])
-        self.assertEqual(values['nym_transfer_requested'], 2_000_000)
-        self.assertEqual(h.globals['nym_last'], 2_000_000)
+        self.assertEqual(values['nym_transfer_requested'], 200_000)
+        self.assertEqual(h.globals['nym_last'], 200_000)
 
     def test_domestic_arrivals_cannot_be_reexported(self):
         h = world(available=100)
@@ -217,7 +229,7 @@ class Execution(unittest.TestCase):
         h = world()
         h.cached_population = {s: h.population(s) for s in h.states}
         h.click()
-        self.assertEqual(h.globals['nym_last'], 2_000_000)
+        self.assertEqual(h.globals['nym_last'], 200_000)
         self.assertNotIn('nym_pending', h.globals)
 
     def test_delayed_move_locks_attempt_and_successor(self):
@@ -260,9 +272,9 @@ class Execution(unittest.TestCase):
     def test_verified_partial_move_counts_measured_amount(self):
         h = world(move=lambda h, p, d, n: h.apply_move(p, d, n // 2))
         h.click()
-        self.assertEqual(h.moved, 1_000_000)
+        self.assertEqual(h.moved, 100_000)
         self.assertEqual(h.globals['nym_last'], h.moved)
-        self.assertEqual(h.country.vars['nym_transfer_requested'], 2_000_000)
+        self.assertEqual(h.country.vars['nym_transfer_requested'], 200_000)
 
     def test_over_request_stops_and_does_not_commit(self):
         h = world(move=lambda h, p, d, n: h.apply_move(p, d, n + 1))
@@ -290,7 +302,7 @@ class Execution(unittest.TestCase):
         h.click()
         self.assertEqual(h.country.vars['nym_source_count'], 4)
         self.assertEqual(h.country.vars['nym_source_people'], 40_000_000)
-        self.assertEqual(h.country.vars['nym_transfer_requested'], 2_000_000)
+        self.assertEqual(h.country.vars['nym_transfer_requested'], 200_000)
         self.assertEqual(h.country.vars['nym_transfer_calls'], len(CELLS))
         h = world()
         h.states = h.states[:1]
@@ -326,16 +338,16 @@ class Execution(unittest.TestCase):
         h = world()
         h.states = [s for s in h.states if s.region not in REGIONS['siam']]
         h.click()
-        self.assertEqual(h.moved, 1_600_000)
+        self.assertEqual(h.moved, 160_000)
         self.assertEqual(h.globals['nym_actual_siam_min'], 0)
 
     def test_culture_shortage_no_substitution(self):
         h = world()
         h.pops = [p for p in h.pops if p.culture != 'min']
         h.click()
-        self.assertEqual(h.moved, 1_100_000)
+        self.assertEqual(h.moved, 110_000)
         self.assertEqual(h.globals['nym_uses'], 1)
-        self.assertEqual(h.durations['nym_cooldown'], ('years', 5))
+        self.assertEqual(h.durations['nym_cooldown'], ('years', 3))
 
     def test_limited_source_never_negative(self):
         h = world(available=133)
@@ -360,20 +372,20 @@ class Execution(unittest.TestCase):
         h.globals = copy.deepcopy(h.globals)  # simulate saving persistent scalar state
         h.country = Country()  # successor using the same CHI country definition
         h.click()
-        self.assertEqual(h.moved, 2_000_000)
+        self.assertEqual(h.moved, 200_000)
         del h.globals['nym_cooldown']  # emulate native variable expiry, not a test of game time
         source = State('BEIJING', h.country)
         h.states.append(source)
         h.pops += [Pop(source, c, 10_000_000) for c in CULTURES]
         h.click()
-        self.assertEqual(h.globals['nym_last'], 2_500_000)
+        self.assertEqual(h.globals['nym_last'], 250_000)
         self.assertEqual(h.globals['nym_uses'], 2)
 
     def test_source_region_unrestricted(self):
         h = world()
         h.states[0].region = 'ALASKA'
         h.click()
-        self.assertEqual(h.moved, 2_000_000)
+        self.assertEqual(h.moved, 200_000)
 
     def test_religion_preserved(self):
         h = world(religion='protestant')
@@ -391,7 +403,7 @@ class Execution(unittest.TestCase):
         h = world()
         for s in h.states[1:]: s.owner = Country('cd:USA', False)
         h.click()
-        self.assertEqual(h.moved, 2_000_000)
+        self.assertEqual(h.moved, 200_000)
 
     def test_same_state_and_preexisting_arrival_budget(self):
         h = world(available=100)
@@ -431,7 +443,7 @@ class Execution(unittest.TestCase):
         h.pops = []
         h.click()
         self.assertEqual(h.globals['nym_uses'], 1)
-        self.assertEqual(h.globals['nym_last'], 2_000_000)
+        self.assertEqual(h.globals['nym_last'], 200_000)
         self.assertNotIn('nym_cooldown', h.globals)
 
 if __name__ == '__main__':

@@ -12,30 +12,6 @@ nym_last_target = {
     if = { limit = { has_global_variable = nym_last_target } value = global_var:nym_last_target }
 }
 nym_target = {
-    value = 5000000
-    if = { limit = { nym_uses = 0 } value = 2000000 }
-    else_if = { limit = { nym_uses = 1 } value = 2500000 }
-    else_if = { limit = { nym_uses = 2 } value = 3125000 }
-    else_if = { limit = { nym_uses = 3 } value = 3906250 }
-    else_if = { limit = { nym_uses = 4 } value = 4882813 }
-}
-nym_following_target = {
-    value = 5000000
-    if = { limit = { nym_uses = 0 } value = 2500000 }
-    else_if = { limit = { nym_uses = 1 } value = 3125000 }
-    else_if = { limit = { nym_uses = 2 } value = 3906250 }
-    else_if = { limit = { nym_uses = 3 } value = 4882813 }
-    else_if = { limit = { nym_uses = 4 } value = 5000000 }
-}
-nym_plan_malaya_min = {
-    value = 600000
-    if = { limit = { nym_uses = 0 } value = 240000 }
-    else_if = { limit = { nym_uses = 1 } value = 300000 }
-    else_if = { limit = { nym_uses = 2 } value = 375000 }
-    else_if = { limit = { nym_uses = 3 } value = 468750 }
-    else_if = { limit = { nym_uses = 4 } value = 585938 }
-}
-nym_plan_malaya_yue = {
     value = 500000
     if = { limit = { nym_uses = 0 } value = 200000 }
     else_if = { limit = { nym_uses = 1 } value = 250000 }
@@ -43,71 +19,23 @@ nym_plan_malaya_yue = {
     else_if = { limit = { nym_uses = 3 } value = 390625 }
     else_if = { limit = { nym_uses = 4 } value = 488281 }
 }
-nym_plan_malaya_hakka = {
-    value = 350000
-    if = { limit = { nym_uses = 0 } value = 140000 }
-    else_if = { limit = { nym_uses = 1 } value = 175000 }
-    else_if = { limit = { nym_uses = 2 } value = 218750 }
-    else_if = { limit = { nym_uses = 3 } value = 273438 }
-    else_if = { limit = { nym_uses = 4 } value = 341797 }
+nym_following_target = {
+    value = 500000
+    if = { limit = { nym_uses = 0 } value = 250000 }
+    else_if = { limit = { nym_uses = 1 } value = 312500 }
+    else_if = { limit = { nym_uses = 2 } value = 390625 }
+    else_if = { limit = { nym_uses = 3 } value = 488281 }
+    else_if = { limit = { nym_uses = 4 } value = 500000 }
 }
-nym_plan_malaya_han = {
-    value = 300000
-    if = { limit = { nym_uses = 0 } value = 120000 }
-    else_if = { limit = { nym_uses = 1 } value = 150000 }
-    else_if = { limit = { nym_uses = 2 } value = 187500 }
-    else_if = { limit = { nym_uses = 3 } value = 234375 }
-    else_if = { limit = { nym_uses = 4 } value = 292969 }
+nym_plan_malaya_min = {
+    value = 60000
+    if = { limit = { nym_uses = 0 } value = 24000 }
+    else_if = { limit = { nym_uses = 1 } value = 30000 }
+    else_if = { limit = { nym_uses = 2 } value = 37500 }
+    else_if = { limit = { nym_uses = 3 } value = 46875 }
+    else_if = { limit = { nym_uses = 4 } value = 58594 }
 }
-nym_plan_east_indies_min = {
-    value = 650000
-    if = { limit = { nym_uses = 0 } value = 260000 }
-    else_if = { limit = { nym_uses = 1 } value = 325000 }
-    else_if = { limit = { nym_uses = 2 } value = 406250 }
-    else_if = { limit = { nym_uses = 3 } value = 507813 }
-    else_if = { limit = { nym_uses = 4 } value = 634766 }
-}
-nym_plan_east_indies_yue = {
-    value = 200000
-    if = { limit = { nym_uses = 0 } value = 80000 }
-    else_if = { limit = { nym_uses = 1 } value = 100000 }
-    else_if = { limit = { nym_uses = 2 } value = 125000 }
-    else_if = { limit = { nym_uses = 3 } value = 156250 }
-    else_if = { limit = { nym_uses = 4 } value = 195313 }
-}
-nym_plan_east_indies_hakka = {
-    value = 300000
-    if = { limit = { nym_uses = 0 } value = 120000 }
-    else_if = { limit = { nym_uses = 1 } value = 150000 }
-    else_if = { limit = { nym_uses = 2 } value = 187500 }
-    else_if = { limit = { nym_uses = 3 } value = 234375 }
-    else_if = { limit = { nym_uses = 4 } value = 292969 }
-}
-nym_plan_east_indies_han = {
-    value = 100000
-    if = { limit = { nym_uses = 0 } value = 40000 }
-    else_if = { limit = { nym_uses = 1 } value = 50000 }
-    else_if = { limit = { nym_uses = 2 } value = 62500 }
-    else_if = { limit = { nym_uses = 3 } value = 78125 }
-    else_if = { limit = { nym_uses = 4 } value = 97656 }
-}
-nym_plan_siam_min = {
-    value = 700000
-    if = { limit = { nym_uses = 0 } value = 280000 }
-    else_if = { limit = { nym_uses = 1 } value = 350000 }
-    else_if = { limit = { nym_uses = 2 } value = 437500 }
-    else_if = { limit = { nym_uses = 3 } value = 546875 }
-    else_if = { limit = { nym_uses = 4 } value = 683594 }
-}
-nym_plan_siam_yue = {
-    value = 150000
-    if = { limit = { nym_uses = 0 } value = 60000 }
-    else_if = { limit = { nym_uses = 1 } value = 75000 }
-    else_if = { limit = { nym_uses = 2 } value = 93750 }
-    else_if = { limit = { nym_uses = 3 } value = 117188 }
-    else_if = { limit = { nym_uses = 4 } value = 146484 }
-}
-nym_plan_siam_hakka = {
+nym_plan_malaya_yue = {
     value = 50000
     if = { limit = { nym_uses = 0 } value = 20000 }
     else_if = { limit = { nym_uses = 1 } value = 25000 }
@@ -115,61 +43,133 @@ nym_plan_siam_hakka = {
     else_if = { limit = { nym_uses = 3 } value = 39063 }
     else_if = { limit = { nym_uses = 4 } value = 48828 }
 }
+nym_plan_malaya_hakka = {
+    value = 35000
+    if = { limit = { nym_uses = 0 } value = 14000 }
+    else_if = { limit = { nym_uses = 1 } value = 17500 }
+    else_if = { limit = { nym_uses = 2 } value = 21875 }
+    else_if = { limit = { nym_uses = 3 } value = 27344 }
+    else_if = { limit = { nym_uses = 4 } value = 34180 }
+}
+nym_plan_malaya_han = {
+    value = 30000
+    if = { limit = { nym_uses = 0 } value = 12000 }
+    else_if = { limit = { nym_uses = 1 } value = 15000 }
+    else_if = { limit = { nym_uses = 2 } value = 18750 }
+    else_if = { limit = { nym_uses = 3 } value = 23438 }
+    else_if = { limit = { nym_uses = 4 } value = 29297 }
+}
+nym_plan_east_indies_min = {
+    value = 65000
+    if = { limit = { nym_uses = 0 } value = 26000 }
+    else_if = { limit = { nym_uses = 1 } value = 32500 }
+    else_if = { limit = { nym_uses = 2 } value = 40625 }
+    else_if = { limit = { nym_uses = 3 } value = 50781 }
+    else_if = { limit = { nym_uses = 4 } value = 63476 }
+}
+nym_plan_east_indies_yue = {
+    value = 20000
+    if = { limit = { nym_uses = 0 } value = 8000 }
+    else_if = { limit = { nym_uses = 1 } value = 10000 }
+    else_if = { limit = { nym_uses = 2 } value = 12500 }
+    else_if = { limit = { nym_uses = 3 } value = 15625 }
+    else_if = { limit = { nym_uses = 4 } value = 19531 }
+}
+nym_plan_east_indies_hakka = {
+    value = 30000
+    if = { limit = { nym_uses = 0 } value = 12000 }
+    else_if = { limit = { nym_uses = 1 } value = 15000 }
+    else_if = { limit = { nym_uses = 2 } value = 18750 }
+    else_if = { limit = { nym_uses = 3 } value = 23438 }
+    else_if = { limit = { nym_uses = 4 } value = 29297 }
+}
+nym_plan_east_indies_han = {
+    value = 10000
+    if = { limit = { nym_uses = 0 } value = 4000 }
+    else_if = { limit = { nym_uses = 1 } value = 5000 }
+    else_if = { limit = { nym_uses = 2 } value = 6250 }
+    else_if = { limit = { nym_uses = 3 } value = 7813 }
+    else_if = { limit = { nym_uses = 4 } value = 9766 }
+}
+nym_plan_siam_min = {
+    value = 70000
+    if = { limit = { nym_uses = 0 } value = 28000 }
+    else_if = { limit = { nym_uses = 1 } value = 35000 }
+    else_if = { limit = { nym_uses = 2 } value = 43750 }
+    else_if = { limit = { nym_uses = 3 } value = 54687 }
+    else_if = { limit = { nym_uses = 4 } value = 68359 }
+}
+nym_plan_siam_yue = {
+    value = 15000
+    if = { limit = { nym_uses = 0 } value = 6000 }
+    else_if = { limit = { nym_uses = 1 } value = 7500 }
+    else_if = { limit = { nym_uses = 2 } value = 9375 }
+    else_if = { limit = { nym_uses = 3 } value = 11719 }
+    else_if = { limit = { nym_uses = 4 } value = 14648 }
+}
+nym_plan_siam_hakka = {
+    value = 5000
+    if = { limit = { nym_uses = 0 } value = 2000 }
+    else_if = { limit = { nym_uses = 1 } value = 2500 }
+    else_if = { limit = { nym_uses = 2 } value = 3125 }
+    else_if = { limit = { nym_uses = 3 } value = 3906 }
+    else_if = { limit = { nym_uses = 4 } value = 4883 }
+}
 nym_plan_siam_han = {
-    value = 100000
-    if = { limit = { nym_uses = 0 } value = 40000 }
-    else_if = { limit = { nym_uses = 1 } value = 50000 }
-    else_if = { limit = { nym_uses = 2 } value = 62500 }
-    else_if = { limit = { nym_uses = 3 } value = 78125 }
-    else_if = { limit = { nym_uses = 4 } value = 97656 }
+    value = 10000
+    if = { limit = { nym_uses = 0 } value = 4000 }
+    else_if = { limit = { nym_uses = 1 } value = 5000 }
+    else_if = { limit = { nym_uses = 2 } value = 6250 }
+    else_if = { limit = { nym_uses = 3 } value = 7812 }
+    else_if = { limit = { nym_uses = 4 } value = 9766 }
 }
 nym_plan_indochina_min = {
-    value = 100000
-    if = { limit = { nym_uses = 0 } value = 40000 }
-    else_if = { limit = { nym_uses = 1 } value = 50000 }
-    else_if = { limit = { nym_uses = 2 } value = 62500 }
-    else_if = { limit = { nym_uses = 3 } value = 78125 }
-    else_if = { limit = { nym_uses = 4 } value = 97656 }
+    value = 10000
+    if = { limit = { nym_uses = 0 } value = 4000 }
+    else_if = { limit = { nym_uses = 1 } value = 5000 }
+    else_if = { limit = { nym_uses = 2 } value = 6250 }
+    else_if = { limit = { nym_uses = 3 } value = 7812 }
+    else_if = { limit = { nym_uses = 4 } value = 9766 }
 }
 nym_plan_indochina_yue = {
-    value = 450000
-    if = { limit = { nym_uses = 0 } value = 180000 }
-    else_if = { limit = { nym_uses = 1 } value = 225000 }
-    else_if = { limit = { nym_uses = 2 } value = 281250 }
-    else_if = { limit = { nym_uses = 3 } value = 351562 }
-    else_if = { limit = { nym_uses = 4 } value = 439453 }
+    value = 45000
+    if = { limit = { nym_uses = 0 } value = 18000 }
+    else_if = { limit = { nym_uses = 1 } value = 22500 }
+    else_if = { limit = { nym_uses = 2 } value = 28125 }
+    else_if = { limit = { nym_uses = 3 } value = 35156 }
+    else_if = { limit = { nym_uses = 4 } value = 43945 }
 }
 nym_plan_indochina_hakka = {
-    value = 50000
-    if = { limit = { nym_uses = 0 } value = 20000 }
-    else_if = { limit = { nym_uses = 1 } value = 25000 }
-    else_if = { limit = { nym_uses = 2 } value = 31250 }
-    else_if = { limit = { nym_uses = 3 } value = 39062 }
-    else_if = { limit = { nym_uses = 4 } value = 48828 }
+    value = 5000
+    if = { limit = { nym_uses = 0 } value = 2000 }
+    else_if = { limit = { nym_uses = 1 } value = 2500 }
+    else_if = { limit = { nym_uses = 2 } value = 3125 }
+    else_if = { limit = { nym_uses = 3 } value = 3906 }
+    else_if = { limit = { nym_uses = 4 } value = 4883 }
 }
 nym_plan_philippines_min = {
-    value = 200000
-    if = { limit = { nym_uses = 0 } value = 80000 }
-    else_if = { limit = { nym_uses = 1 } value = 100000 }
-    else_if = { limit = { nym_uses = 2 } value = 125000 }
-    else_if = { limit = { nym_uses = 3 } value = 156250 }
-    else_if = { limit = { nym_uses = 4 } value = 195313 }
+    value = 20000
+    if = { limit = { nym_uses = 0 } value = 8000 }
+    else_if = { limit = { nym_uses = 1 } value = 10000 }
+    else_if = { limit = { nym_uses = 2 } value = 12500 }
+    else_if = { limit = { nym_uses = 3 } value = 15625 }
+    else_if = { limit = { nym_uses = 4 } value = 19531 }
 }
 nym_plan_philippines_yue = {
-    value = 50000
-    if = { limit = { nym_uses = 0 } value = 20000 }
-    else_if = { limit = { nym_uses = 1 } value = 25000 }
-    else_if = { limit = { nym_uses = 2 } value = 31250 }
-    else_if = { limit = { nym_uses = 3 } value = 39062 }
-    else_if = { limit = { nym_uses = 4 } value = 48828 }
+    value = 5000
+    if = { limit = { nym_uses = 0 } value = 2000 }
+    else_if = { limit = { nym_uses = 1 } value = 2500 }
+    else_if = { limit = { nym_uses = 2 } value = 3125 }
+    else_if = { limit = { nym_uses = 3 } value = 3906 }
+    else_if = { limit = { nym_uses = 4 } value = 4883 }
 }
 nym_plan_burma_yue = {
-    value = 150000
-    if = { limit = { nym_uses = 0 } value = 60000 }
-    else_if = { limit = { nym_uses = 1 } value = 75000 }
-    else_if = { limit = { nym_uses = 2 } value = 93750 }
-    else_if = { limit = { nym_uses = 3 } value = 117187 }
-    else_if = { limit = { nym_uses = 4 } value = 146484 }
+    value = 15000
+    if = { limit = { nym_uses = 0 } value = 6000 }
+    else_if = { limit = { nym_uses = 1 } value = 7500 }
+    else_if = { limit = { nym_uses = 2 } value = 9375 }
+    else_if = { limit = { nym_uses = 3 } value = 11719 }
+    else_if = { limit = { nym_uses = 4 } value = 14648 }
 }
 
 # POP scope: read its live size and cap it against the country's destination quota.

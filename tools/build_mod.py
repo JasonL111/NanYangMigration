@@ -1,12 +1,16 @@
 """Generate the distributable native-script mod. Python is a development tool only."""
 from pathlib import Path
+from fractions import Fraction
 import json
 
 ROOT = Path(__file__).resolve().parents[1]
 MOD = ROOT / 'nanyang_migration'
-VERSION = '1.1.0-rc.4'
-VERSION_LABEL = '1.1.0 RC4'
+VERSION = '1.1.0'
 GAME_VERSION = '1.15.2'
+INITIAL_TARGET = 200_000
+MAX_TARGET = 500_000
+GROWTH_PERCENT = 25
+COOLDOWN_YEARS = 3
 CULTURES = ['min', 'yue', 'hakka', 'han']
 MATRIX = {
     'malaya': [12, 10, 7, 6],
@@ -26,8 +30,22 @@ REGIONS = {
     'philippines': ['LUZON', 'VISAYAS', 'MINDANAO'],
     'burma': ['ARAKAN', 'PEGU', 'MANDALAY', 'KACHIN', 'SHAN_STATES', 'TENASSERIM'],
 }
-TARGETS = [2000000, 2500000, 3125000, 3906250, 4882813, 5000000]
 CELLS = [(r, c, w) for r, row in MATRIX.items() for c, w in zip(CULTURES, row) if w]
+
+
+def target_schedule():
+    """Grow the exact base, rounding only the quota issued for each expedition."""
+    exact = Fraction(INITIAL_TARGET)
+    multiplier = Fraction(100 + GROWTH_PERCENT, 100)
+    amounts = []
+    while (rounded := int(exact + Fraction(1, 2))) < MAX_TARGET:
+        amounts.append(rounded)
+        exact *= multiplier
+    return amounts + [MAX_TARGET]
+
+
+TARGETS = target_schedule()
+
 
 def apportion(total):
     """Hamilton: largest remainders, stable row-major tie break."""
@@ -44,8 +62,8 @@ def write(path, contents, bom=False):
 
 def table_value(name, nums):
     out = f'{name} = {{\n    value = {nums[-1]}\n'
-    for i in range(5):
-        out += ('    if' if i == 0 else '    else_if') + f' = {{ limit = {{ nym_uses = {i} }} value = {nums[i]} }}\n'
+    for i, value in enumerate(nums[:-1]):
+        out += ('    if' if i == 0 else '    else_if') + f' = {{ limit = {{ nym_uses = {i} }} value = {value} }}\n'
     return out + '}\n'
 
 def main():
@@ -97,7 +115,7 @@ nym_last_target = {
 }
 '''
     values += table_value('nym_target', TARGETS)
-    values += table_value('nym_following_target', TARGETS[1:] + [5000000])
+    values += table_value('nym_following_target', TARGETS[1:] + [MAX_TARGET])
     for i, (r, c, _) in enumerate(CELLS):
         values += table_value(f'nym_plan_{r}_{c}', [apportion(t)[i] for t in TARGETS])
     values += '''
@@ -255,7 +273,7 @@ nym_execute = {
         set_global_variable = { name = nym_last value = var:nym_actual }
         set_global_variable = { name = nym_last_target value = var:nym_requested }
         change_global_variable = { name = nym_uses add = 1 }
-        set_global_variable = { name = nym_cooldown value = yes years = 5 }
+        set_global_variable = { name = nym_cooldown value = yes years = @COOLDOWN_YEARS@ }
         remove_global_variable = nym_pending
         trigger_event = { id = nanyang_migration.1 }
     }
@@ -396,7 +414,7 @@ nym_move_and_verify = {
     }}
 '''
     effects += '}\n'
-    write('common/scripted_effects/nanyang_effects.txt', effects)
+    write('common/scripted_effects/nanyang_effects.txt', effects.replace('@COOLDOWN_YEARS@', str(COOLDOWN_YEARS)))
     write('events/nanyang_events.txt', '''
 namespace = nanyang_migration
 nanyang_migration.1 = {
@@ -421,76 +439,94 @@ nanyang_migration.3 = {
     option = { name = nym_ack }
 }
 ''')
-    dyn = lambda name: "[GetPlayer.MakeScope.ScriptValue('" + name + "')|0]"
+    def shown(name):
+        return f"[GetPlayer.MakeScope.ScriptValue('{name}')|0]"
+
+    current = shown('nym_target')
+    following = shown('nym_following_target')
+    departures = shown('nym_uses')
+    previous_plan = shown('nym_last_target')
+    previous_arrivals = shown('nym_last')
     zh = {
         'je_nanyang_migration': '下南洋',
-        'je_nanyang_migration_reason': '自闽粤沿海至南洋诸邦，华人远渡重洋、经商谋生，渐成海外聚落。国家可以组织大规模移民，使闽人、粤人、客家人与汉人迁往东南亚，在异域建立新的家园。\\n\\n累计成功：' + dyn('nym_uses') + ' 次；本次计划：' + dyn('nym_target') + ' 人。\\n上次计划：' + dyn('nym_last_target') + ' 人；上次实际完成：' + dyn('nym_last') + ' 人。\\n本次成功后的下一次目标：' + dyn('nym_following_target') + ' 人。冷却状态请查看按钮条件；成功后须等待5个游戏年。',
+        'je_nanyang_migration_reason': (
+            '早有乡民自闽粤沿海扬帆，赴南洋谋生。如今官府可召集愿意远行的人家，'
+            '为他们安排航程，到异乡安家。\\n\\n'
+            f'已办航次：{departures}　待发人数：{current}\\n'
+            f'上次计划：{previous_plan} 人　上次抵达：{previous_arrivals} 人\\n'
+            f'本次顺利启航后，下次可筹办 {following} 人。'
+        ),
         'nym_organize_name': '组织下南洋',
-        'nym_organize_desc': '本次计划迁移 ' + dyn('nym_target') + ' 人。来源为本国所有拥有的州，不设省份限制。\\n文化总比例：闽45%、粤30%、客家15%、汉10%。\\n目的地：马来亚及新加坡35%、荷属东印度25%、暹罗20%、印度支那12%、菲律宾5%、缅甸3%。按固定交叉矩阵执行；州内不设子地区权重，实际州等额分配并补整数余数。\\n成功后冷却5年，下一次增加25%，上限500万人。人口或有效目的地不足时仅完成可行部分；零迁移不扣次数与冷却。',
-        'nym_cooldown_tt': '距离上一次成功组织下南洋已满5个游戏年（首次无需等待）',
-        'nym_attempt_tt': '立即按固定文化与地理矩阵组织真实人口迁移；完成量见结果通知。',
+        'nym_organize_desc': (
+            f'筹办一次赴南洋的航程，计划从本国各州招募 {current} 人。\\n\\n'
+            '闽人占45%，粤人占30%，客家人占15%，汉人占10%。\\n'
+            '马来亚及新加坡接收35%，荷属东印度25%，暹罗20%，印度支那12%，'
+            '菲律宾5%，缅甸3%。\\n\\n'
+            f'首航计划 {INITIAL_TARGET:,} 人。每次成功后，下一航次的计划人数增加 {GROWTH_PERCENT}%，'
+            f'最多 {MAX_TARGET:,} 人。两次成功航次之间须休整 {COOLDOWN_YEARS} 个游戏年。'
+        ),
+        'nym_cooldown_tt': '船队的休整期已结束。',
+        'nym_pending_tt': '上次航程尚未结报，暂不能再派船队。',
+        'nym_attempt_tt': '派船将应募人家送往南洋。实际抵达人数将在航程结束后公布。',
         'nym_success_title': '南洋的新家园',
-        'nym_success_desc': '本次目标：' + dyn('nym_last_target') + ' 人。\\n实际迁移：' + dyn('nym_last') + ' 人。\\n累计成功：' + dyn('nym_uses') + ' 次。下次目标：' + dyn('nym_target') + ' 人。\\n已进入5年冷却。人口不足或目的地不可用的份额不会用其他文化或地区补足。移民保留文化与宗教，抵达后按原生规则失业或转职。',
+        'nym_success_desc': (
+            '满载行囊的船队已抵达南洋。移民们在港口登岸，准备在当地谋生、安家。\\n\\n'
+            f'本次计划 {previous_plan} 人，实际抵达 {previous_arrivals} 人。\\n'
+            f'下一航次可筹办 {current} 人，船队需休整 {COOLDOWN_YEARS} 个游戏年。'
+        ),
         'nym_failure_title': '航程未能启行',
-        'nym_failure_desc': '本次记录的迁入量为零，因此未增加成功次数或消耗冷却。这不等于全国人口不足：请检查可迁移文化、有效目的州以及脚本错误日志。若人口实际变化而记录为零，属于脚本或统计错误；上一次成功记录保持不变。',
+        'nym_failure_desc': '这趟航程未能成行，本次没有派遣移民。待条件合适，便可再次筹办。',
+        'nym_pending_title': '航报未至',
+        'nym_pending_desc': (
+            '各港的回报尚未齐备，官府暂缓派出下一支船队。'
+            '如需重新筹办这次航程，请载入启航前的存档。'
+        ),
         'nym_ack': '知悉',
     }
     en = {
         'je_nanyang_migration': 'Nanyang Migration',
-        'je_nanyang_migration_reason': 'Chinese communities cross the seas to establish new homes in Southeast Asia. Organize immediate migration from all owned states.\\n\\nSuccessful expeditions: ' + dyn('nym_uses') + '. Current target: ' + dyn('nym_target') + ' persons.\\nLast target: ' + dyn('nym_last_target') + '; last actual: ' + dyn('nym_last') + '.\\nFollowing target after success: ' + dyn('nym_following_target') + '. Consult the button conditions for the five-year cooldown.',
+        'je_nanyang_migration_reason': (
+            'For generations, families have sailed from the ports of southern China to seek '
+            'a living in Nanyang. The government can now arrange passage for those who wish '
+            'to make a home across the sea.\\n\\n'
+            f'Expeditions completed: {departures}. Current plan: {current} people.\\n'
+            f'Last expedition: {previous_plan} planned, {previous_arrivals} arrived.\\n'
+            f'If this expedition succeeds, the next can carry {following} people.'
+        ),
         'nym_organize_name': 'Organize Nanyang Migration',
-        'nym_organize_desc': 'Target: ' + dyn('nym_target') + ' persons from all owned states, without source province restrictions.\\nCultures: Min 45%, Yue 30%, Hakka 15%, Han 10%.\\nDestinations: Malaya/Singapore 35%, East Indies 25%, Siam 20%, Indochina 12%, Philippines 5%, Burma 3%, using the fixed cross-matrix. Equal shares across actual states with integer remainders.\\nFive-year cooldown on success; target grows by 25%, capped at 5 million. Shortages permit partial execution; zero movement consumes neither cooldown nor a successful use.',
-        'nym_cooldown_tt': 'Five in-game years have elapsed since the last successful expedition (no wait for first use)',
-        'nym_attempt_tt': 'Immediately transfer existing people using the fixed culture/geography matrix; see the result notification for actual movement.',
+        'nym_organize_desc': (
+            f'Arrange passage to Nanyang for up to {current} people from your states.\\n\\n'
+            'The expedition is planned for Min 45%, Yue 30%, Hakka 15%, and Han 10%.\\n'
+            'Destinations are Malaya and Singapore 35%, the Dutch East Indies 25%, Siam 20%, '
+            'Indochina 12%, the Philippines 5%, and Burma 3%.\\n\\n'
+            f'The first expedition plans for {INITIAL_TARGET:,} people. Each success increases the next '
+            f'plan by {GROWTH_PERCENT}% up to {MAX_TARGET:,}. The fleet rests for {COOLDOWN_YEARS} in-game years after each success.'
+        ),
+        'nym_cooldown_tt': 'The fleet has finished refitting.',
+        'nym_pending_tt': 'Reports from the last voyage must come in before another fleet can depart.',
+        'nym_attempt_tt': 'Send the settlers to Nanyang. The arrival report will record how many reached their destinations.',
         'nym_success_title': 'New Homes in Nanyang',
-        'nym_success_desc': 'Target: ' + dyn('nym_last_target') + ' persons.\\nActually moved: ' + dyn('nym_last') + '.\\nSuccessful expeditions: ' + dyn('nym_uses') + '. Next target: ' + dyn('nym_target') + '.\\nA five-year cooldown has begun. Unavailable shares are not reassigned. Migrants retain their culture and religion; native rules govern unemployment and occupational changes.',
-        'nym_failure_title': 'The Expedition Could Not Depart',
-        'nym_failure_desc': 'Recorded arrivals are zero. No successful use or cooldown was consumed. This does not establish a national population shortage: check eligible cultures, destinations and script error logs. If populations changed despite a zero record, this is a script or accounting error. The last successful record is unchanged.',
+        'nym_success_desc': (
+            'The fleet has reached Nanyang. Families are stepping ashore with their belongings, '
+            'ready to make a living in their new homes.\\n\\n'
+            f'The expedition planned for {previous_plan} people. {previous_arrivals} arrived.\\n'
+            f'The next expedition can carry {current} people after {COOLDOWN_YEARS} in-game years of refitting.'
+        ),
+        'nym_failure_title': 'A Voyage Postponed',
+        'nym_failure_desc': 'The expedition did not depart and no settlers were sent. You can organize another voyage when conditions allow.',
+        'nym_pending_title': 'Word from Overseas',
+        'nym_pending_desc': (
+            'Reports from the ports are incomplete, so the government has put further departures on hold. '
+            'To arrange this voyage again, load a save from before the expedition set out.'
+        ),
         'nym_ack': 'Understood',
     }
     for lang, data in [('simp_chinese', zh), ('english', en)]:
-        val = lambda name: "[GetPlayer.MakeScope.Var('" + name + "').GetValue|0]"
-        if lang == 'simp_chinese':
-            diagnostic = (f'\\n\\n{VERSION_LABEL} 诊断：来源POP数 ' + val('nym_source_count') + '；来源总人口 ' + val('nym_source_people')
-                + '。\\n目的州数（马来亚/东印度/暹罗/印度支那/菲律宾/缅甸）：'
-                + '/'.join(val('nym_count_'+r) for r in REGIONS)
-                + '。\\n启动配额 ' + val('nym_cells_started') + '；正额度州份数 ' + val('nym_positive_shares')
-                + '；同文化候选 ' + val('nym_culture_candidates')
-                + '；通过筛选的来源与目的配对 ' + val('nym_source_matches')
-                + '。\\n转移调用次数 ' + val('nym_transfer_calls') + '；请求人口合计 ' + val('nym_transfer_requested')
-                + '；记录迁入合计 ' + val('nym_actual') + '。\\n若进入待确认，请保留截图与本次 error.log。')
-            data['nym_failure_title'] = '下南洋：本次未发出转移请求'
-            data['nym_failure_desc'] = '本次没有调用原生人口移动效果。诊断依次显示来源、目的州、额度、配对和调用次数。'
-        else:
-            diagnostic = (f'\\n\\n{VERSION_LABEL} diagnostics: source POPs ' + val('nym_source_count') + '; source persons ' + val('nym_source_people')
-                + '.\\nDestination states (Malaya/East Indies/Siam/Indochina/Philippines/Burma): '
-                + '/'.join(val('nym_count_'+r) for r in REGIONS)
-                + '.\\nAllocation cells started ' + val('nym_cells_started') + '; positive state shares ' + val('nym_positive_shares')
-                + '; same-culture candidates ' + val('nym_culture_candidates')
-                + '; eligible source-to-destination pairs ' + val('nym_source_matches')
-                + '.\\nMove calls ' + val('nym_transfer_calls') + '; requested persons ' + val('nym_transfer_requested')
-                + '; recorded arrivals ' + val('nym_actual')
-                + '.\\nIf verification is blocked, retain this report and error.log.')
-            data['nym_failure_title'] = 'Nanyang: No Transfer Requested'
-            data['nym_failure_desc'] = 'No native move was called. The diagnostics show sources, destinations, allocation, eligible pairs and move calls.'
-        if lang == 'simp_chinese':
-            data['nym_pending_tt'] = '上次转移尚未确认。请查看结果和日志，或载入操作前的存档。'
-            data['nym_pending_title'] = '下南洋：迁移待确认'
-            data['nym_pending_desc'] = '本次移动后的来源与目的 POP 读数未能确认同一笔转移。已停止后续移动并锁定重试。'
-            diagnostic += ('\\n末笔请求 ' + val('nym_last_request') + '；来源减少 ' + val('nym_source_delta')
-                           + '；目的增加 ' + val('nym_destination_delta') + '。')
-        else:
-            data['nym_pending_tt'] = 'The previous transfer is unconfirmed. Check the report and logs or load a save from before the attempt.'
-            data['nym_pending_title'] = 'Nanyang: Transfer Unconfirmed'
-            data['nym_pending_desc'] = 'The source and destination POP readings did not confirm the same transfer. Further moves and retries are locked.'
-            diagnostic += ('\\nLast request ' + val('nym_last_request') + '; source decrease ' + val('nym_source_delta')
-                           + '; destination increase ' + val('nym_destination_delta') + '.')
-        data['nym_pending_desc'] += diagnostic
-        data['nym_failure_desc'] += diagnostic
-        data['nym_success_desc'] += diagnostic
         write(f'localization/{lang}/nanyang_l_{lang}.yml', f'l_{lang}:\n' + '\n'.join(f' {k}:0 "{v}"' for k, v in data.items()), bom=True)
     write('docs/design.json', json.dumps({'cultures': CULTURES, 'matrix': MATRIX,
-          'regions': REGIONS, 'targets': TARGETS, 'rounding': 'Hamilton, row-major tie break',
+          'regions': REGIONS, 'initial_target': INITIAL_TARGET, 'max_target': MAX_TARGET,
+          'growth_percent': GROWTH_PERCENT, 'cooldown_years': COOLDOWN_YEARS,
+          'targets': TARGETS, 'rounding': 'Hamilton, row-major tie break',
           'cell_plans': {str(t): apportion(t) for t in TARGETS}}, indent=2))
 
 if __name__ == '__main__':
