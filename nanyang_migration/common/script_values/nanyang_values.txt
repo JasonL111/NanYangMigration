@@ -188,7 +188,7 @@ nym_state_share = {
 nym_live_population = {
     value = 0
     every_scope_pop = {
-        limit = { culture = scope:nym_country.var:nym_current_culture }
+        limit = { culture = scope:nym_current_culture }
         add = total_size
     }
 }

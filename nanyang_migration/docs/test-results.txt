@@ -11,10 +11,13 @@ test_full_transfer_and_matrix_all_six_levels (test_mod.Execution.test_full_trans
 test_limited_source_never_negative (test_mod.Execution.test_limited_source_never_negative) ... ok
 test_missing_region_no_redistribution (test_mod.Execution.test_missing_region_no_redistribution) ... ok
 test_native_no_op_is_unconfirmed_and_preserves_history (test_mod.Execution.test_native_no_op_is_unconfirmed_and_preserves_history) ... ok
+test_no_op_stops_remaining_pops_in_same_state_pass (test_mod.Execution.test_no_op_stops_remaining_pops_in_same_state_pass) ... ok
 test_over_request_stops_and_does_not_commit (test_mod.Execution.test_over_request_stops_and_does_not_commit) ... ok
 test_religion_preserved (test_mod.Execution.test_religion_preserved) ... ok
 test_same_state_and_preexisting_arrival_budget (test_mod.Execution.test_same_state_and_preexisting_arrival_budget) ... ok
+test_screen_report_shape_reaches_native_move (test_mod.Execution.test_screen_report_shape_reaches_native_move) ... ok
 test_source_region_unrestricted (test_mod.Execution.test_source_region_unrestricted) ... ok
+test_split_cannot_reexport_copied_origin_marker (test_mod.Execution.test_split_cannot_reexport_copied_origin_marker) ... ok
 test_split_states_equal_and_integer_remainders (test_mod.Execution.test_split_states_equal_and_integer_remainders) ... ok
 test_stale_state_aggregates_do_not_mask_immediate_move (test_mod.Execution.test_stale_state_aggregates_do_not_mask_immediate_move) ... ok
 test_unbalanced_population_stops (test_mod.Execution.test_unbalanced_population_stops) ... ok
@@ -34,6 +37,6 @@ test_matrix (test_mod.Mathematics.test_matrix) ... ok
 test_rounding_from_emitted_values (test_mod.Mathematics.test_rounding_from_emitted_values) ... ok
 
 ----------------------------------------------------------------------
-Ran 33 tests
+Ran 36 tests
 
 OK

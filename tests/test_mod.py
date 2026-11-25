@@ -30,7 +30,7 @@ def world(uses=0, available=10_000_000, split=1, religion='confucian', move=imme
 class Files(unittest.TestCase):
     def test_metadata(self):
         d = json.loads((MOD/'.metadata/metadata.json').read_text())
-        self.assertEqual(d['version'], '1.1.0-rc.1')
+        self.assertEqual(d['version'], '1.1.0-rc.2')
         self.assertEqual(d['supported_game_version'], '1.15.2')
 
     def test_all_scripts_parse_and_no_empty_files(self):
@@ -76,8 +76,7 @@ class Files(unittest.TestCase):
         events = parse((MOD/'events/nanyang_events.txt').read_text())
         ids = {k for k,_,_ in events}
         self.assertLessEqual(set(re.findall(r'id\s*=\s*(nanyang_migration\.\d+)', text)), ids)
-        self.assertEqual(set(re.findall(r'\$([A-Z_]+)\$', text)),
-                         {'AMOUNT', 'COUNT', 'DESTINATIONS', 'CULTURE', 'SOURCES', 'CELL_RECORD'})
+        self.assertNotRegex(text, r'\$[A-Z_]+\$|\b(?:add_to_list|every_in_list)\s*=')
 
     def test_versioned_identifiers(self):
         evidence = json.loads((MOD/'docs/reference_ids.json').read_text())
@@ -159,6 +158,43 @@ class Mathematics(unittest.TestCase):
                 self.assertLess(abs(amount-target*weight/100), 1)
 
 class Execution(unittest.TestCase):
+    def test_screen_report_shape_reaches_native_move(self):
+        # Recreate the reported totals with synthetic POPs in all four cultures.
+        # The screenshot did not expose the real culture or state breakdown.
+        h = world()
+        source, *destinations = h.states
+        people, extra = divmod(337_827_747, 832)
+        h.pops = [Pop(source, CULTURES[i % 4], people + (i < extra)) for i in range(832)]
+        counts = [5, 32, 3, 13, 7, 12]
+        h.states = [source] + [
+            State(destination.region, destination.owner)
+            for destination, count in zip(destinations, counts)
+            for _ in range(count)
+        ]
+
+        h.click()
+
+        values = h.country.vars
+        self.assertEqual(values['nym_source_count'], 832)
+        self.assertEqual(values['nym_source_people'], 337_827_747)
+        self.assertEqual([values['nym_count_'+region] for region in REGIONS], counts)
+        self.assertEqual(values['nym_cells_started'], len(CELLS))
+        self.assertEqual(values['nym_positive_shares'], 225)
+        # A share can consume the remainder of one donor and continue with another.
+        self.assertGreaterEqual(values['nym_transfer_calls'], values['nym_positive_shares'])
+        self.assertEqual(values['nym_source_matches'], values['nym_transfer_calls'])
+        self.assertEqual(values['nym_transfer_requested'], 2_000_000)
+        self.assertEqual(h.globals['nym_last'], 2_000_000)
+
+    def test_no_op_stops_remaining_pops_in_same_state_pass(self):
+        h = world(move=lambda *_: None)
+        h.pops.append(Pop(h.states[0], 'min', 10_000_000))
+        h.click()
+        self.assertEqual(h.country.vars['nym_source_matches'], 1)
+        self.assertEqual(h.country.vars['nym_transfer_calls'], 1)
+        self.assertEqual(h.events, ['nanyang_migration.3'])
+        self.assertIn('nym_pending', h.globals)
+
     def test_stale_state_aggregates_do_not_mask_immediate_move(self):
         h = world()
         h.cached_population = {s: h.population(s) for s in h.states}
@@ -351,6 +387,22 @@ class Execution(unittest.TestCase):
         self.assertEqual(sum(p.size for p in h.pops), initial)
         self.assertTrue(all(a is not b for a,b,_,_ in h.transfers))
         self.assertTrue(all(p.size >= 0 for p in h.pops))
+
+    def test_split_cannot_reexport_copied_origin_marker(self):
+        def copy_split_variables(h, pop, destination, amount):
+            before = len(h.pops)
+            h.apply_move(pop, destination, amount)
+            if len(h.pops) > before:
+                h.pops[-1].vars.update(pop.vars)
+                h.pops[-1].vars['nym_available'] = amount
+
+        h = world(available=100, move=copy_split_variables)
+        for state in h.states:
+            state.owner = h.country
+        h.click()
+        self.assertEqual(h.moved, 400)
+        self.assertTrue(all(origin is h.states[0] for origin, *_ in h.transfers))
+        self.assertTrue(all('nym_available' not in pop.vars for pop in h.pops if pop.size > 0))
 
     def test_failure_preserves_last_success(self):
         h = world()

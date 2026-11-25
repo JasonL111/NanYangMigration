@@ -1,4 +1,4 @@
-# 下南洋 · Nanyang Migration 1.1.0 RC1
+# 下南洋 · Nanyang Migration 1.1.0 RC2
 
 目标版本：**Victoria 3 1.15.2**。原生 Paradox Script，运行时无外部依赖。
 这是已生成并通过静态/模拟执行检查的安装候选包；本环境没有游戏，
@@ -130,9 +130,9 @@
 
 ## 升级与游戏内验收
 
-1. 完全退出游戏，移除旧 Mod 目录再解压新版，确保播放集中只启用一个正式版本。
+1. 完全退出游戏，移除旧 Mod 目录再解压新版，确保播放集中只启用一个正式版本。新版结果弹窗标为 **1.1.0 RC2**。若 RC1 的结果显示转移调用为 0，则该次点击没有发出转移请求。
 2. 用 1.15.2 新建 1836 大清备份测试档。打开“下南洋”，检查按钮和 200 万计划。先做独立小额诊断可确认原生迁移行为，见仓库的诊断 ZIP。
-3. 在测试档点击一次正式按钮，核对结果、弹窗中的末笔请求及两端人口差额，并比较来源和目的州的文化人口。核对累计成功为 1、下次目标为 250 万、五年冷却和保存重载。
+3. 在测试档点击一次正式按钮，核对结果、弹窗中的末笔请求及两端人口差额，并比较来源和目的州的文化人口。若调用仍为零，保留本次的启动配额、正额度州份数和通过筛选的配对数。核对累计成功为 1、下次目标为 250 万、五年冷却和保存重载。
 4. 若显示“迁移待确认”，保留操作前存档和完整弹窗。一次性提供游戏版本/校验码、Mod 版本、弹窗、同次运行的 `logs/error.log` 和独立诊断报告。必要时提供点击前后的人口界面截图。
 
 旧游戏版本存档升级取决于游戏自身兼容性，本候选版未实测。旧 Mod 的 `nym_uses`、`nym_cooldown`、最近成功记录继续读取，旧暂存数据不参与新操作。1.0.0–1.0.2 的零记录可能对应已发生的移动。优先以旧版第一次点击之前的备份验证。由于没有可靠的旧迁移账目，此版本不能自动恢复旧版人口。
@@ -141,4 +141,4 @@
 
 ## English installation summary
 
-Target: Victoria 3 1.15.2, release candidate 1.1.0 RC1. Extract the complete `nanyang_migration` folder into the game's user-data `mod` directory, keeping `.metadata/metadata.json`. Enable it in a Launcher playset. No DLC or runtime dependencies are required. Use a backed-up new Qing save. If the report says “Transfer Unconfirmed”, reload the pre-attempt save for another test and retain the report and game log. Engine acceptance remains pending.
+Target: Victoria 3 1.15.2, release candidate 1.1.0 RC2. Extract the complete `nanyang_migration` folder into the game's user-data `mod` directory, keeping `.metadata/metadata.json`. Enable it in a Launcher playset. No DLC or runtime dependencies are required. Use a backed-up new Qing save. If the report says “Transfer Unconfirmed”, reload the pre-attempt save for another test and retain the report and game log. Engine acceptance remains pending.
