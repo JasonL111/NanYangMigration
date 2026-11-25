@@ -1,0 +1,18 @@
+{
+  ".metadata/metadata.json": "43719b6a2b9c43438c30f0af08359da8d516b40ba40a81d1d88ca76eeb25ac60",
+  "README.md": "c07e5a78ead83be143eee511583ab584ed90c4210d0331258e51ffeccad924ba",
+  "common/journal_entries/ocm_journal.txt": "a73094769292057804feb87abfa559f0df760bf800016014c2af0e08344e25e7",
+  "common/script_values/ocm_population.txt": "2ac4006e69fa6b3ef4f3f8473954dd33f8d44c512770ddb09f88f99d0a9ca6a1",
+  "common/scripted_buttons/ocm_buttons.txt": "a7e57cdb3f13b7b29349a15d401cc22023e8a87e49828e9423cdb126791c6050",
+  "common/scripted_effects/ocm_recognition.txt": "f3d0ece0cfa0d0716367f4b5c6224a32ebd5527c592dfcbe63aa820a30972550",
+  "common/scripted_triggers/ocm_eligibility.txt": "27fc034bf730f36f8588ffd115f42610ef8f0fc5e80d676f9693272c10f93081",
+  "docs/CHANGELOG.md": "01ec7cd7df8c3f15c8a78b37bae986b4f78358167476a7d96047e11cb40c63aa",
+  "docs/DESIGN.md": "459e8341b50584ad5e1a64717375105b9efdf75af56d1b531ac3bd28342365a7",
+  "docs/NATIVE_SCRIPT_REFERENCE.md": "fd91cf868a70df1a94c490a93e23d7f93e8f1fc4911daf3e6f618ec13061ecf8",
+  "docs/PLAYTEST.md": "d0e18b6f1e8722fcc257531e8e08af1f6eaed7c849ef67fb86938cf1f51cc075",
+  "docs/VALIDATION.md": "2415777fa117f938e113b5f48e403ac21308d5e03d532ed21686236f306451c3",
+  "events/ocm_events.txt": "5b96e9622ab9e5149be8348bff2a3ae590f229260fb221af72460308c071ddd3",
+  "gfx/event_pictures/ocm_guild_hall.dds": "3aa76c5336fe535c8ed08101e010a8ce8141111b8c9b3655a16d8d1e57e1718e",
+  "localization/english/ocm_l_english.yml": "6b6f40836c2af94c49c449e6741b206c5f02825e139922ea565cb9027700dc1d",
+  "localization/simp_chinese/ocm_l_simp_chinese.yml": "574cb18cfdd2930d0ed579b570787374964d3a12b78015963d0d16fd415a44fa"
+}

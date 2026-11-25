@@ -1,0 +1,9 @@
+ocm_je_mobilization = {
+    group = je_group_foreign_affairs
+    context = country
+    is_shown_when_inactive = { ocm_can_mobilize = yes }
+    possible = { ocm_can_mobilize = yes }
+    can_deactivate = yes
+    can_revolution_inherit = yes
+    scripted_button = ocm_mobilize
+}

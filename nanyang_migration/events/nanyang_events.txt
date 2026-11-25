@@ -4,6 +4,7 @@ nanyang_migration.1 = {
     title = nym_success_title
     desc = nym_success_desc
     is_popup = yes
+    event_image = { texture = "gfx/event_pictures/nanyang_harbor.dds" }
     option = { name = nym_ack }
 }
 nanyang_migration.2 = {
@@ -11,6 +12,7 @@ nanyang_migration.2 = {
     title = nym_failure_title
     desc = nym_failure_desc
     is_popup = yes
+    event_image = { texture = "gfx/event_pictures/nanyang_harbor.dds" }
     option = { name = nym_ack }
 }
 nanyang_migration.3 = {
@@ -18,5 +20,6 @@ nanyang_migration.3 = {
     title = nym_pending_title
     desc = nym_pending_desc
     is_popup = yes
+    event_image = { texture = "gfx/event_pictures/nanyang_harbor.dds" }
     option = { name = nym_ack }
 }

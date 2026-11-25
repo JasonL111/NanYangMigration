@@ -1,4 +1,4 @@
-# 下南洋 · Nanyang Migration 1.1.0
+# 下南洋 · Nanyang Migration 1.1.1
 
 目标版本：**Victoria 3 1.15.2**。原生 Paradox Script，运行时无外部依赖。
 首航计划 **200,000 人**，成功后下一航次增加 **25%**，单次最多 **500,000 人**，
@@ -37,7 +37,7 @@
 
 日志显示累计成功次数、当前计划、上次目标、上次实际完成量以及本次成功后的下一次目标。
 按钮条件显示冷却是否满足；不添加自定义 GUI，也不声称显示未经验证的冷却结束日期。
-航报显示实际抵达人数和下一航次计划。航程未能启行时可再次筹办。若结果是「航报未至」，请载入启航前的存档再试。
+三个航程结果弹窗均使用港口插图。航报显示实际抵达人数和下一航次计划。航程未能启行时可再次筹办。若结果是「航报未至」，请载入启航前的存档再试。
 
 ## 精确设计参数
 
@@ -125,7 +125,7 @@
 
 ## 从旧版升级
 
-退出游戏后，用新版目录替换旧安装，并在启动器中确认版本为 **1.1.0**。
+退出游戏后，用新版目录替换旧安装，并在启动器中确认版本为 **1.1.1**。
 存档中的成功次数和历史航次保留。**下一次计划按新额度计算**。若旧版已开始冷却，
 原来的到期时间保留，升级后成功的航次起用三年冷却。
 
@@ -133,7 +133,7 @@
 
 ## English installation summary
 
-Target: Victoria 3 1.15.2, version 1.1.0. Extract the `nanyang_migration` folder into the
+Target: Victoria 3 1.15.2, version 1.1.1. Extract the `nanyang_migration` folder into the
 game's user-data `mod` directory, keeping `.metadata/metadata.json`, then enable it in the Launcher.
 The first expedition plans for 200,000 people. Each success raises the next plan by 25% to a maximum
 of 500,000 and starts a three-year cooldown. Existing saves retain completed expeditions and cooldowns

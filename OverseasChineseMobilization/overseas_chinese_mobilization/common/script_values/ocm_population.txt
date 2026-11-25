@@ -1,0 +1,15 @@
+# Both values run in the candidate country's scope, excluding its subjects.
+ocm_chinese_population = {
+    value = 0
+    every_scope_pop = {
+        limit = { ocm_is_chinese_pop = yes }
+        add = total_size
+    }
+}
+
+# A whole number of people must meet 40%; never round the displayed share.
+ocm_required_population = {
+    value = total_population
+    multiply = 0.4
+    ceiling = yes
+}

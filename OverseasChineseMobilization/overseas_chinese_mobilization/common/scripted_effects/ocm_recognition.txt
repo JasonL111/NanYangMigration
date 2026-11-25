@@ -1,0 +1,30 @@
+# Starts and finishes on the player country. This is the only gameplay effect.
+ocm_recognize_overseas_communities = {
+    if = {
+        limit = { ocm_can_mobilize = yes }
+        save_scope_as = ocm_actor
+        set_variable = { name = ocm_confirmed_count value = 0 }
+        every_country = {
+            limit = { ocm_is_eligible_target = yes }
+            add_primary_culture = cu:han
+            if = {
+                limit = { country_has_primary_culture = cu:han }
+                scope:ocm_actor = {
+                    change_variable = { name = ocm_confirmed_count add = 1 }
+                }
+            }
+        }
+        save_scope_value_as = {
+            name = ocm_confirmed_recognitions
+            value = var:ocm_confirmed_count
+        }
+        if = {
+            limit = { var:ocm_confirmed_count > 0 }
+            trigger_event = { id = overseas_chinese_mobilization.1 }
+        }
+        else = {
+            trigger_event = { id = overseas_chinese_mobilization.2 }
+        }
+        remove_variable = ocm_confirmed_count
+    }
+}

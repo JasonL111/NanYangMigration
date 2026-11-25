@@ -2,6 +2,7 @@ import copy
 import json
 from pathlib import Path
 import re
+from struct import unpack_from
 import sys
 import unittest
 
@@ -30,7 +31,7 @@ def world(uses=0, available=10_000_000, split=1, religion='confucian', move=imme
 class Files(unittest.TestCase):
     def test_metadata(self):
         d = json.loads((MOD/'.metadata/metadata.json').read_text())
-        self.assertEqual(d['version'], '1.1.0')
+        self.assertEqual(d['version'], '1.1.1')
         self.assertEqual(d['supported_game_version'], '1.15.2')
 
     def test_all_scripts_parse_and_no_empty_files(self):
@@ -84,6 +85,17 @@ class Files(unittest.TestCase):
         ids = {k for k,_,_ in events}
         self.assertLessEqual(set(re.findall(r'id\s*=\s*(nanyang_migration\.\d+)', text)), ids)
         self.assertNotRegex(text, r'\$[A-Z_]+\$|\b(?:add_to_list|every_in_list)\s*=')
+
+    def test_all_result_events_reference_the_packaged_harbor_art(self):
+        events = parse((MOD/'events/nanyang_events.txt').read_text())
+        pictures = [fields(fields(block)['event_image'])['texture']
+                    for key, _, block in events if key.startswith('nanyang_migration.')]
+        self.assertEqual(pictures, ['gfx/event_pictures/nanyang_harbor.dds'] * 3)
+        data = (MOD/pictures[0]).read_bytes()
+        self.assertEqual(data[:4], b'DDS ')
+        self.assertEqual(data[84:88], b'DXT1')
+        self.assertEqual(unpack_from('<II', data, 12), (960, 1280))
+        self.assertEqual(len(data), 128 + 320*240*8)
 
     def test_versioned_identifiers(self):
         evidence = json.loads((MOD/'docs/reference_ids.json').read_text())

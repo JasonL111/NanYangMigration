@@ -1,0 +1,60 @@
+# Country identity is shared by the actor and target rules.
+ocm_is_china = {
+    OR = {
+        country_definition = cd:CHI
+        AND = {
+            exists = civil_war_origin_country
+            civil_war_origin_country ?= { country_definition = cd:CHI }
+        }
+        AND = {
+            has_global_variable = chinese_central_government
+            global_var:chinese_central_government ?= this
+        }
+    }
+}
+
+ocm_can_mobilize = {
+    is_player = yes
+    ocm_is_china = yes
+}
+
+# POP scope. These are four explicit IDs, not a heritage or language group.
+ocm_is_chinese_pop = {
+    OR = {
+        culture = cu:han
+        culture = cu:min
+        culture = cu:yue
+        culture = cu:hakka
+    }
+}
+
+# If the four shares total 40%, at least one is 10% or higher.
+# Use a looser native filter and make the decision on integer POP counts below.
+ocm_may_have_large_community = {
+    OR = {
+        culture_percent_country = { target = cu:han value >= 0.09 }
+        culture_percent_country = { target = cu:min value >= 0.09 }
+        culture_percent_country = { target = cu:yue value >= 0.09 }
+        culture_percent_country = { target = cu:hakka value >= 0.09 }
+    }
+}
+
+ocm_is_eligible_target = {
+    trigger_if = {
+        limit = {
+            is_country_alive = yes
+            NOR = {
+                ocm_is_china = yes
+                country_tier = hegemony
+                country_has_primary_culture = cu:han
+            }
+            total_population > 0
+        }
+        trigger_if = {
+            limit = { ocm_may_have_large_community = yes }
+            ocm_chinese_population >= ocm_required_population
+        }
+        trigger_else = { always = no }
+    }
+    trigger_else = { always = no }
+}

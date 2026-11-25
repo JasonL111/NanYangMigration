@@ -1,0 +1,12 @@
+{
+  "name": "动员侨民 · Overseas Chinese Mobilization",
+  "id": "overseas_chinese_mobilization",
+  "version": "1.0.0",
+  "supported_game_version": "1.15.2",
+  "short_description": "Recognize Han as a primary culture in eligible overseas countries.",
+  "tags": ["Gameplay", "Historical"],
+  "relationships": [],
+  "game_custom_data": {
+    "multiplayer_synchronized": true
+  }
+}

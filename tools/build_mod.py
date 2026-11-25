@@ -5,7 +5,8 @@ import json
 
 ROOT = Path(__file__).resolve().parents[1]
 MOD = ROOT / 'nanyang_migration'
-VERSION = '1.1.0'
+HARBOR_TEXTURE = 'gfx/event_pictures/nanyang_harbor.dds'
+VERSION = '1.1.1'
 GAME_VERSION = '1.15.2'
 INITIAL_TARGET = 200_000
 MAX_TARGET = 500_000
@@ -67,6 +68,8 @@ def table_value(name, nums):
     return out + '}\n'
 
 def main():
+    if not (MOD / HARBOR_TEXTURE).is_file():
+        raise FileNotFoundError(f'Missing event illustration: {HARBOR_TEXTURE}')
     write('.metadata/metadata.json', json.dumps({
         'name': '下南洋 · Nanyang Migration', 'id': 'nanyang_migration',
         'version': VERSION, 'supported_game_version': GAME_VERSION,
@@ -415,30 +418,18 @@ nym_move_and_verify = {
 '''
     effects += '}\n'
     write('common/scripted_effects/nanyang_effects.txt', effects.replace('@COOLDOWN_YEARS@', str(COOLDOWN_YEARS)))
-    write('events/nanyang_events.txt', '''
-namespace = nanyang_migration
-nanyang_migration.1 = {
+    events = 'namespace = nanyang_migration\n'
+    for event_id, outcome in enumerate(('success', 'failure', 'pending'), 1):
+        events += f'''nanyang_migration.{event_id} = {{
     type = country_event
-    title = nym_success_title
-    desc = nym_success_desc
+    title = nym_{outcome}_title
+    desc = nym_{outcome}_desc
     is_popup = yes
-    option = { name = nym_ack }
-}
-nanyang_migration.2 = {
-    type = country_event
-    title = nym_failure_title
-    desc = nym_failure_desc
-    is_popup = yes
-    option = { name = nym_ack }
-}
-nanyang_migration.3 = {
-    type = country_event
-    title = nym_pending_title
-    desc = nym_pending_desc
-    is_popup = yes
-    option = { name = nym_ack }
-}
-''')
+    event_image = {{ texture = "{HARBOR_TEXTURE}" }}
+    option = {{ name = nym_ack }}
+}}
+'''
+    write('events/nanyang_events.txt', events)
     def shown(name):
         return f"[GetPlayer.MakeScope.ScriptValue('{name}')|0]"
 

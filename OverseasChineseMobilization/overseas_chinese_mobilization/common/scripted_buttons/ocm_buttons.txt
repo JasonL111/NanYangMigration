@@ -1,0 +1,20 @@
+ocm_mobilize = {
+    name = ocm_mobilize_name
+    desc = ocm_mobilize_desc
+    visible = { ocm_can_mobilize = yes }
+    possible = {
+        custom_tooltip = {
+            text = ocm_player_required
+            ocm_can_mobilize = yes
+        }
+        custom_tooltip = {
+            text = ocm_target_required
+            any_country = { ocm_is_eligible_target = yes }
+        }
+    }
+    ai_chance = { base = 0 }
+    effect = {
+        custom_tooltip = ocm_recognition_effect
+        hidden_effect = { ocm_recognize_overseas_communities = yes }
+    }
+}
