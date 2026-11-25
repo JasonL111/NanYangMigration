@@ -1,11 +1,14 @@
 # 下南洋 / Nanyang Migration
 
-**1.1.0 RC4**，目标游戏版本 **Victoria 3 1.15.2**。玩家可组织中国人口迁往南洋。使用原生 Paradox Script，安装与游戏运行无需 Python，无额外 DLC 要求。候选版已核对版本化脚本文档、通过静态和场景测试，真实引擎验收待完成。
+**1.1.0**（Victoria 3 **1.15.2**）。组织闽、粤、客家与汉人赴南洋安家。首航计划
+**200,000 人**，每次成功后下一航次增加 **25%**，单次最多 **500,000 人**，成功后休整 **3 个游戏年**。
+无需额外 DLC 或运行时依赖。
 
-- 正式玩法候选包：[nanyang_migration.zip](nanyang_migration.zip) · [SHA-256](nanyang_migration.zip.sha256)
-- 独立小额诊断包：[nanyang_native_probe.zip](nanyang_native_probe.zip) · [SHA-256](nanyang_native_probe.zip.sha256)
-- [安装、迁移机制与旧档](nanyang_migration/README.md) · [改动记录](nanyang_migration/docs/CHANGELOG.md)
-- [1.15 兼容性调查](nanyang_migration/docs/COMPATIBILITY_1_15.md) · [原生脚本证据](nanyang_migration/docs/NATIVE_SCRIPT_REFERENCE.md) · [验证报告](nanyang_migration/docs/VALIDATION.md)
+- [正式安装包](nanyang_migration.zip) · [SHA-256](nanyang_migration.zip.sha256)
+- [安装说明与迁移矩阵](nanyang_migration/README.md) · [版本记录](nanyang_migration/docs/CHANGELOG.md)
+- [1.15 兼容性](nanyang_migration/docs/COMPATIBILITY_1_15.md) · [原生脚本参考](nanyang_migration/docs/NATIVE_SCRIPT_REFERENCE.md) · [验证报告](nanyang_migration/docs/VALIDATION.md)
+
+开发用的[独立诊断包](nanyang_native_probe.zip)不需要安装到正常游玩的播放集。
 
 开发命令，从仓库根目录运行：
 

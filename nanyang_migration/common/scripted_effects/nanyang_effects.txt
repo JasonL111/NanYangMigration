@@ -369,7 +369,7 @@ nym_execute = {
         set_global_variable = { name = nym_last value = var:nym_actual }
         set_global_variable = { name = nym_last_target value = var:nym_requested }
         change_global_variable = { name = nym_uses add = 1 }
-        set_global_variable = { name = nym_cooldown value = yes years = 5 }
+        set_global_variable = { name = nym_cooldown value = yes years = 3 }
         remove_global_variable = nym_pending
         trigger_event = { id = nanyang_migration.1 }
     }
