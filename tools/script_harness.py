@@ -67,7 +67,7 @@ class Pop:
     vars: dict = field(default_factory=dict)
 
 class Harness:
-    def __init__(self, mod, *, move=None):
+    def __init__(self, mod, *, move=None, ignore_pop_writes=False, ignore_state_writes=False):
         self.defs = {}
         for f in (Path(mod)/'common').rglob('*.txt'):
             for key, _, value in parse(f.read_text(encoding='utf-8-sig')):
@@ -85,6 +85,9 @@ class Harness:
         self.moved = 0
         self.transfers = []
         self.move = move
+        # Fault injection only. It does not assert these faults occur in Victoria 3.
+        self.ignore_pop_writes = ignore_pop_writes
+        self.ignore_state_writes = ignore_state_writes
         self.cached_population = {}
         self.delayed_moves = []
 
@@ -226,6 +229,11 @@ class Harness:
                 elif operator != '?=':
                     raise ValueError('Invalid required scope: ' + key)
             elif key in ('set_variable', 'set_global_variable'):
+                if key == 'set_variable' and (
+                    (isinstance(obj, Pop) and self.ignore_pop_writes)
+                    or (isinstance(obj, State) and self.ignore_state_writes)
+                ):
+                    continue
                 store = self.globals if key == 'set_global_variable' else obj.vars
                 if not f:
                     store[value] = True

@@ -30,7 +30,7 @@ def world(uses=0, available=10_000_000, split=1, religion='confucian', move=imme
 class Files(unittest.TestCase):
     def test_metadata(self):
         d = json.loads((MOD/'.metadata/metadata.json').read_text())
-        self.assertEqual(d['version'], '1.1.0-rc.2')
+        self.assertEqual(d['version'], '1.1.0-rc.3')
         self.assertEqual(d['supported_game_version'], '1.15.2')
 
     def test_all_scripts_parse_and_no_empty_files(self):
@@ -158,7 +158,7 @@ class Mathematics(unittest.TestCase):
                 self.assertLess(abs(amount-target*weight/100), 1)
 
 class Execution(unittest.TestCase):
-    def test_screen_report_shape_reaches_native_move(self):
+    def test_screen_report_shape_reaches_native_move_without_pop_variables(self):
         # Recreate the reported totals with synthetic POPs in all four cultures.
         # The screenshot did not expose the real culture or state breakdown.
         h = world()
@@ -171,6 +171,7 @@ class Execution(unittest.TestCase):
             for destination, count in zip(destinations, counts)
             for _ in range(count)
         ]
+        h.ignore_pop_writes = True
 
         h.click()
 
@@ -182,9 +183,29 @@ class Execution(unittest.TestCase):
         self.assertEqual(values['nym_positive_shares'], 225)
         # A share can consume the remainder of one donor and continue with another.
         self.assertGreaterEqual(values['nym_transfer_calls'], values['nym_positive_shares'])
+        self.assertEqual(values['nym_culture_candidates'], values['nym_source_matches'])
         self.assertEqual(values['nym_source_matches'], values['nym_transfer_calls'])
         self.assertEqual(values['nym_transfer_requested'], 2_000_000)
         self.assertEqual(h.globals['nym_last'], 2_000_000)
+
+    def test_domestic_arrivals_without_pop_markers_cannot_be_reexported(self):
+        h = world(available=100)
+        for state in h.states:
+            state.owner = h.country
+        h.ignore_pop_writes = True
+        h.click()
+        self.assertEqual(h.moved, 400)
+        self.assertTrue(all(origin is h.states[0] for origin, *_ in h.transfers))
+        self.assertGreater(h.country.vars['nym_culture_candidates'], h.country.vars['nym_source_matches'])
+
+    def test_failed_state_receipt_write_never_calls_move(self):
+        h = world()
+        h.ignore_state_writes = True
+        h.click()
+        self.assertEqual(h.country.vars['nym_source_matches'], 1)
+        self.assertEqual(h.country.vars['nym_transfer_calls'], 0)
+        self.assertEqual(h.events, ['nanyang_migration.2'])
+        self.assertNotIn('nym_pending', h.globals)
 
     def test_no_op_stops_remaining_pops_in_same_state_pass(self):
         h = world(move=lambda *_: None)

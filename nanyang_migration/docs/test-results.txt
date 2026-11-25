@@ -6,6 +6,8 @@ test_culture_shortage_no_substitution (test_mod.Execution.test_culture_shortage_
 test_delayed_move_locks_attempt_and_successor (test_mod.Execution.test_delayed_move_locks_attempt_and_successor) ... ok
 test_destination_ownership_irrelevant (test_mod.Execution.test_destination_ownership_irrelevant) ... ok
 test_diagnostic_counters (test_mod.Execution.test_diagnostic_counters) ... ok
+test_domestic_arrivals_without_pop_markers_cannot_be_reexported (test_mod.Execution.test_domestic_arrivals_without_pop_markers_cannot_be_reexported) ... ok
+test_failed_state_receipt_write_never_calls_move (test_mod.Execution.test_failed_state_receipt_write_never_calls_move) ... ok
 test_failure_preserves_last_success (test_mod.Execution.test_failure_preserves_last_success) ... ok
 test_full_transfer_and_matrix_all_six_levels (test_mod.Execution.test_full_transfer_and_matrix_all_six_levels) ... ok
 test_limited_source_never_negative (test_mod.Execution.test_limited_source_never_negative) ... ok
@@ -15,7 +17,7 @@ test_no_op_stops_remaining_pops_in_same_state_pass (test_mod.Execution.test_no_o
 test_over_request_stops_and_does_not_commit (test_mod.Execution.test_over_request_stops_and_does_not_commit) ... ok
 test_religion_preserved (test_mod.Execution.test_religion_preserved) ... ok
 test_same_state_and_preexisting_arrival_budget (test_mod.Execution.test_same_state_and_preexisting_arrival_budget) ... ok
-test_screen_report_shape_reaches_native_move (test_mod.Execution.test_screen_report_shape_reaches_native_move) ... ok
+test_screen_report_shape_reaches_native_move_without_pop_variables (test_mod.Execution.test_screen_report_shape_reaches_native_move_without_pop_variables) ... ok
 test_source_region_unrestricted (test_mod.Execution.test_source_region_unrestricted) ... ok
 test_split_cannot_reexport_copied_origin_marker (test_mod.Execution.test_split_cannot_reexport_copied_origin_marker) ... ok
 test_split_states_equal_and_integer_remainders (test_mod.Execution.test_split_states_equal_and_integer_remainders) ... ok
@@ -37,6 +39,6 @@ test_matrix (test_mod.Mathematics.test_matrix) ... ok
 test_rounding_from_emitted_values (test_mod.Mathematics.test_rounding_from_emitted_values) ... ok
 
 ----------------------------------------------------------------------
-Ran 36 tests
+Ran 38 tests
 
 OK

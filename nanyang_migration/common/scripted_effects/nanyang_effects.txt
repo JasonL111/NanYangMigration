@@ -15,12 +15,16 @@ nym_execute = {
     set_variable = { name = nym_cells_started value = 0 }
     set_variable = { name = nym_positive_shares value = 0 }
     set_variable = { name = nym_source_matches value = 0 }
+    set_variable = { name = nym_culture_candidates value = 0 }
+    set_variable = { name = nym_culture_index value = 0 }
+    # A prior spent/aborted attempt must not leave receipt marks in owned states.
+    every_scope_state = { nym_clear_receipts = yes }
     set_variable = { name = nym_last_request value = 0 }
     set_variable = { name = nym_source_delta value = 0 }
     set_variable = { name = nym_destination_delta value = 0 }
 
-    # Only POPs present at click time can donate. The origin check also
-    # protects against a split inheriting the variables of the old POP.
+    # Snapshots are only required for a state/culture after it receives migrants.
+    # An unreceived source can safely use its shrinking live POP sizes.
     every_scope_pop = {
         limit = { nym_culture = yes total_size >= 1 }
         set_variable = { name = nym_available value = total_size days = 1 }
@@ -71,7 +75,7 @@ nym_execute = {
             nym_plan_malaya_min >= 1
         }
         change_variable = { name = nym_cells_started add = 1 }
-        cu:min = { save_scope_as = nym_current_culture }
+        set_variable = { name = nym_culture_index value = 1 }
         set_variable = { name = nym_cell_unassigned value = nym_plan_malaya_min }
         set_variable = { name = nym_states_left value = var:nym_count_malaya }
         set_variable = { name = nym_cell_actual value = 0 }
@@ -87,7 +91,7 @@ nym_execute = {
             nym_plan_malaya_yue >= 1
         }
         change_variable = { name = nym_cells_started add = 1 }
-        cu:yue = { save_scope_as = nym_current_culture }
+        set_variable = { name = nym_culture_index value = 2 }
         set_variable = { name = nym_cell_unassigned value = nym_plan_malaya_yue }
         set_variable = { name = nym_states_left value = var:nym_count_malaya }
         set_variable = { name = nym_cell_actual value = 0 }
@@ -103,7 +107,7 @@ nym_execute = {
             nym_plan_malaya_hakka >= 1
         }
         change_variable = { name = nym_cells_started add = 1 }
-        cu:hakka = { save_scope_as = nym_current_culture }
+        set_variable = { name = nym_culture_index value = 3 }
         set_variable = { name = nym_cell_unassigned value = nym_plan_malaya_hakka }
         set_variable = { name = nym_states_left value = var:nym_count_malaya }
         set_variable = { name = nym_cell_actual value = 0 }
@@ -119,7 +123,7 @@ nym_execute = {
             nym_plan_malaya_han >= 1
         }
         change_variable = { name = nym_cells_started add = 1 }
-        cu:han = { save_scope_as = nym_current_culture }
+        set_variable = { name = nym_culture_index value = 4 }
         set_variable = { name = nym_cell_unassigned value = nym_plan_malaya_han }
         set_variable = { name = nym_states_left value = var:nym_count_malaya }
         set_variable = { name = nym_cell_actual value = 0 }
@@ -135,7 +139,7 @@ nym_execute = {
             nym_plan_east_indies_min >= 1
         }
         change_variable = { name = nym_cells_started add = 1 }
-        cu:min = { save_scope_as = nym_current_culture }
+        set_variable = { name = nym_culture_index value = 1 }
         set_variable = { name = nym_cell_unassigned value = nym_plan_east_indies_min }
         set_variable = { name = nym_states_left value = var:nym_count_east_indies }
         set_variable = { name = nym_cell_actual value = 0 }
@@ -151,7 +155,7 @@ nym_execute = {
             nym_plan_east_indies_yue >= 1
         }
         change_variable = { name = nym_cells_started add = 1 }
-        cu:yue = { save_scope_as = nym_current_culture }
+        set_variable = { name = nym_culture_index value = 2 }
         set_variable = { name = nym_cell_unassigned value = nym_plan_east_indies_yue }
         set_variable = { name = nym_states_left value = var:nym_count_east_indies }
         set_variable = { name = nym_cell_actual value = 0 }
@@ -167,7 +171,7 @@ nym_execute = {
             nym_plan_east_indies_hakka >= 1
         }
         change_variable = { name = nym_cells_started add = 1 }
-        cu:hakka = { save_scope_as = nym_current_culture }
+        set_variable = { name = nym_culture_index value = 3 }
         set_variable = { name = nym_cell_unassigned value = nym_plan_east_indies_hakka }
         set_variable = { name = nym_states_left value = var:nym_count_east_indies }
         set_variable = { name = nym_cell_actual value = 0 }
@@ -183,7 +187,7 @@ nym_execute = {
             nym_plan_east_indies_han >= 1
         }
         change_variable = { name = nym_cells_started add = 1 }
-        cu:han = { save_scope_as = nym_current_culture }
+        set_variable = { name = nym_culture_index value = 4 }
         set_variable = { name = nym_cell_unassigned value = nym_plan_east_indies_han }
         set_variable = { name = nym_states_left value = var:nym_count_east_indies }
         set_variable = { name = nym_cell_actual value = 0 }
@@ -199,7 +203,7 @@ nym_execute = {
             nym_plan_siam_min >= 1
         }
         change_variable = { name = nym_cells_started add = 1 }
-        cu:min = { save_scope_as = nym_current_culture }
+        set_variable = { name = nym_culture_index value = 1 }
         set_variable = { name = nym_cell_unassigned value = nym_plan_siam_min }
         set_variable = { name = nym_states_left value = var:nym_count_siam }
         set_variable = { name = nym_cell_actual value = 0 }
@@ -215,7 +219,7 @@ nym_execute = {
             nym_plan_siam_yue >= 1
         }
         change_variable = { name = nym_cells_started add = 1 }
-        cu:yue = { save_scope_as = nym_current_culture }
+        set_variable = { name = nym_culture_index value = 2 }
         set_variable = { name = nym_cell_unassigned value = nym_plan_siam_yue }
         set_variable = { name = nym_states_left value = var:nym_count_siam }
         set_variable = { name = nym_cell_actual value = 0 }
@@ -231,7 +235,7 @@ nym_execute = {
             nym_plan_siam_hakka >= 1
         }
         change_variable = { name = nym_cells_started add = 1 }
-        cu:hakka = { save_scope_as = nym_current_culture }
+        set_variable = { name = nym_culture_index value = 3 }
         set_variable = { name = nym_cell_unassigned value = nym_plan_siam_hakka }
         set_variable = { name = nym_states_left value = var:nym_count_siam }
         set_variable = { name = nym_cell_actual value = 0 }
@@ -247,7 +251,7 @@ nym_execute = {
             nym_plan_siam_han >= 1
         }
         change_variable = { name = nym_cells_started add = 1 }
-        cu:han = { save_scope_as = nym_current_culture }
+        set_variable = { name = nym_culture_index value = 4 }
         set_variable = { name = nym_cell_unassigned value = nym_plan_siam_han }
         set_variable = { name = nym_states_left value = var:nym_count_siam }
         set_variable = { name = nym_cell_actual value = 0 }
@@ -263,7 +267,7 @@ nym_execute = {
             nym_plan_indochina_min >= 1
         }
         change_variable = { name = nym_cells_started add = 1 }
-        cu:min = { save_scope_as = nym_current_culture }
+        set_variable = { name = nym_culture_index value = 1 }
         set_variable = { name = nym_cell_unassigned value = nym_plan_indochina_min }
         set_variable = { name = nym_states_left value = var:nym_count_indochina }
         set_variable = { name = nym_cell_actual value = 0 }
@@ -279,7 +283,7 @@ nym_execute = {
             nym_plan_indochina_yue >= 1
         }
         change_variable = { name = nym_cells_started add = 1 }
-        cu:yue = { save_scope_as = nym_current_culture }
+        set_variable = { name = nym_culture_index value = 2 }
         set_variable = { name = nym_cell_unassigned value = nym_plan_indochina_yue }
         set_variable = { name = nym_states_left value = var:nym_count_indochina }
         set_variable = { name = nym_cell_actual value = 0 }
@@ -295,7 +299,7 @@ nym_execute = {
             nym_plan_indochina_hakka >= 1
         }
         change_variable = { name = nym_cells_started add = 1 }
-        cu:hakka = { save_scope_as = nym_current_culture }
+        set_variable = { name = nym_culture_index value = 3 }
         set_variable = { name = nym_cell_unassigned value = nym_plan_indochina_hakka }
         set_variable = { name = nym_states_left value = var:nym_count_indochina }
         set_variable = { name = nym_cell_actual value = 0 }
@@ -311,7 +315,7 @@ nym_execute = {
             nym_plan_philippines_min >= 1
         }
         change_variable = { name = nym_cells_started add = 1 }
-        cu:min = { save_scope_as = nym_current_culture }
+        set_variable = { name = nym_culture_index value = 1 }
         set_variable = { name = nym_cell_unassigned value = nym_plan_philippines_min }
         set_variable = { name = nym_states_left value = var:nym_count_philippines }
         set_variable = { name = nym_cell_actual value = 0 }
@@ -327,7 +331,7 @@ nym_execute = {
             nym_plan_philippines_yue >= 1
         }
         change_variable = { name = nym_cells_started add = 1 }
-        cu:yue = { save_scope_as = nym_current_culture }
+        set_variable = { name = nym_culture_index value = 2 }
         set_variable = { name = nym_cell_unassigned value = nym_plan_philippines_yue }
         set_variable = { name = nym_states_left value = var:nym_count_philippines }
         set_variable = { name = nym_cell_actual value = 0 }
@@ -343,7 +347,7 @@ nym_execute = {
             nym_plan_burma_yue >= 1
         }
         change_variable = { name = nym_cells_started add = 1 }
-        cu:yue = { save_scope_as = nym_current_culture }
+        set_variable = { name = nym_culture_index value = 2 }
         set_variable = { name = nym_cell_unassigned value = nym_plan_burma_yue }
         set_variable = { name = nym_states_left value = var:nym_count_burma }
         set_variable = { name = nym_cell_actual value = 0 }
@@ -355,11 +359,19 @@ nym_execute = {
         remove_variable = nym_available
         remove_variable = nym_origin
     }
+    every_scope_state = { nym_clear_receipts = yes }
     if = {
         limit = { has_variable = nym_transfer_halted }
-        # Retain the save-wide operation lock, even if the native effect was a no-op.
         remove_variable = nym_transfer_halted
-        trigger_event = { id = nanyang_migration.3 }
+        if = {
+            limit = { var:nym_transfer_calls >= 1 }
+            # Keep the lock after an unconfirmed native call, even if it was a no-op.
+            trigger_event = { id = nanyang_migration.3 }
+        }
+        else = {
+            remove_global_variable = nym_pending
+            trigger_event = { id = nanyang_migration.2 }
+        }
     }
     else_if = {
         limit = { var:nym_actual > 0 }
@@ -397,26 +409,47 @@ nym_visit_destination = {
             if = {
                 limit = { var:nym_quota >= 1 }
                 change_variable = { name = nym_positive_shares add = 1 }
-                every_scope_pop = {
+                nym_find_sources = yes
+            }
+        }
+    }
+}
+
+# Country scope. Scope ownership comes from the country's actual State iterator.
+nym_find_sources = {
+    every_scope_state = {
+        limit = { NOT = { this = scope:nym_destination } }
+        if = {
+            limit = {
+                scope:nym_country = {
+                    NOT = { has_variable = nym_transfer_halted }
+                    var:nym_quota >= 1
+                }
+            }
+            save_scope_as = nym_origin_state
+            every_scope_pop = {
+                limit = { nym_culture_matches = yes total_size >= 1 }
+                if = {
                     limit = {
-                        culture = scope:nym_current_culture
-                        has_variable = nym_available
-                    }
-                    # Recheck mutable guards in the body after each native move.
-                    if = {
-                        limit = {
-                            scope:nym_country = {
-                                NOT = { has_variable = nym_transfer_halted }
-                                var:nym_quota >= 1
-                            }
-                            var:nym_available >= 1
-                            total_size >= 1
-                            state = var:nym_origin
-                            owner = scope:nym_country
-                            NOT = { state = scope:nym_destination }
+                        scope:nym_country = {
+                            NOT = { has_variable = nym_transfer_halted }
+                            var:nym_quota >= 1
                         }
-                        scope:nym_country = { change_variable = { name = nym_source_matches add = 1 } }
+                    }
+                    scope:nym_country = { change_variable = { name = nym_culture_candidates add = 1 } }
+                    if = {
+                        limit = { scope:nym_origin_state = { nym_culture_has_receipt = no } }
                         nym_transfer = yes
+                    }
+                    else_if = {
+                        limit = { has_variable = nym_available exists = var:nym_origin }
+                        if = {
+                            limit = {
+                                var:nym_available >= 1
+                                var:nym_origin ?= { this = scope:nym_origin_state }
+                            }
+                            nym_transfer = yes
+                        }
                     }
                 }
             }
@@ -426,34 +459,48 @@ nym_visit_destination = {
 
 # POP scope on entry. After the native effect use only the saved country and states.
 nym_transfer = {
+    scope:nym_country = { change_variable = { name = nym_source_matches add = 1 } }
     save_scope_value_as = { name = nym_amount value = nym_take }
     if = {
         limit = { scope:nym_amount >= 1 }
-        state = { save_scope_as = nym_origin_state }
+        # Mark and verify the actual destination before any native mutation.
+        scope:nym_destination = { nym_mark_receipt = yes }
+        if = {
+            limit = { scope:nym_destination = { nym_culture_has_receipt = yes } }
+            nym_move_and_verify = yes
+        }
+        else = { scope:nym_country = { set_variable = nym_transfer_halted } }
+    }
+}
+
+nym_move_and_verify = {
+    # Debit original POPs even if their state has not received this culture yet.
+    if = {
+        limit = { has_variable = nym_available }
         change_variable = { name = nym_available subtract = scope:nym_amount }
-        scope:nym_country = {
-            set_variable = { name = nym_source_before value = scope:nym_origin_state.nym_live_population }
-            set_variable = { name = nym_destination_before value = scope:nym_destination.nym_live_population }
-            set_variable = { name = nym_last_request value = scope:nym_amount }
-            change_variable = { name = nym_transfer_calls add = 1 }
-            change_variable = { name = nym_transfer_requested add = scope:nym_amount }
-        }
-        move_partial_pop = { state = scope:nym_destination population = scope:nym_amount }
-        scope:nym_country = {
-            set_variable = { name = nym_source_delta value = nym_source_delta }
-            set_variable = { name = nym_destination_delta value = nym_destination_delta }
-            if = {
-                limit = {
-                    var:nym_source_delta > 0
-                    var:nym_source_delta = var:nym_destination_delta
-                    var:nym_destination_delta <= var:nym_last_request
-                }
-                change_variable = { name = nym_actual add = var:nym_destination_delta }
-                change_variable = { name = nym_cell_actual add = var:nym_destination_delta }
-                change_variable = { name = nym_quota subtract = var:nym_destination_delta }
+    }
+    scope:nym_country = {
+        set_variable = { name = nym_source_before value = scope:nym_origin_state.nym_live_population }
+        set_variable = { name = nym_destination_before value = scope:nym_destination.nym_live_population }
+        set_variable = { name = nym_last_request value = scope:nym_amount }
+        change_variable = { name = nym_transfer_calls add = 1 }
+        change_variable = { name = nym_transfer_requested add = scope:nym_amount }
+    }
+    move_partial_pop = { state = scope:nym_destination population = scope:nym_amount }
+    scope:nym_country = {
+        set_variable = { name = nym_source_delta value = nym_source_delta }
+        set_variable = { name = nym_destination_delta value = nym_destination_delta }
+        if = {
+            limit = {
+                var:nym_source_delta > 0
+                var:nym_source_delta = var:nym_destination_delta
+                var:nym_destination_delta <= var:nym_last_request
             }
-            else = { set_variable = nym_transfer_halted }
+            change_variable = { name = nym_actual add = var:nym_destination_delta }
+            change_variable = { name = nym_cell_actual add = var:nym_destination_delta }
+            change_variable = { name = nym_quota subtract = var:nym_destination_delta }
         }
+        else = { set_variable = nym_transfer_halted }
     }
 }
 
@@ -652,5 +699,43 @@ nym_visit_burma = {
             limit = { exists = owner }
             nym_visit_destination = yes
         }
+    }
+}
+
+nym_mark_receipt = {
+    if = {
+        limit = { scope:nym_country = { var:nym_culture_index = 1 } }
+        set_variable = { name = nym_received_min value = yes days = 1 }
+    }
+    if = {
+        limit = { scope:nym_country = { var:nym_culture_index = 2 } }
+        set_variable = { name = nym_received_yue value = yes days = 1 }
+    }
+    if = {
+        limit = { scope:nym_country = { var:nym_culture_index = 3 } }
+        set_variable = { name = nym_received_hakka value = yes days = 1 }
+    }
+    if = {
+        limit = { scope:nym_country = { var:nym_culture_index = 4 } }
+        set_variable = { name = nym_received_han value = yes days = 1 }
+    }
+}
+
+nym_clear_receipts = {
+    if = {
+        limit = { has_variable = nym_received_min }
+        remove_variable = nym_received_min
+    }
+    if = {
+        limit = { has_variable = nym_received_yue }
+        remove_variable = nym_received_yue
+    }
+    if = {
+        limit = { has_variable = nym_received_hakka }
+        remove_variable = nym_received_hakka
+    }
+    if = {
+        limit = { has_variable = nym_received_han }
+        remove_variable = nym_received_han
     }
 }
