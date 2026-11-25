@@ -172,14 +172,10 @@ nym_plan_burma_yue = {
     else_if = { limit = { nym_uses = 4 } value = 146484 }
 }
 
-# Pop scope: cap against the click-time balance, live population and destination quota.
+# POP scope: read its live size and cap it against the country's destination quota.
 nym_take = {
     value = total_size
     max = scope:nym_country.var:nym_quota
-    if = {
-        limit = { scope:nym_origin_state = { nym_culture_has_receipt = yes } }
-        max = var:nym_available
-    }
     floor = yes
 }
 nym_state_share = {

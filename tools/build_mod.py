@@ -4,8 +4,8 @@ import json
 
 ROOT = Path(__file__).resolve().parents[1]
 MOD = ROOT / 'nanyang_migration'
-VERSION = '1.1.0-rc.3'
-VERSION_LABEL = '1.1.0 RC3'
+VERSION = '1.1.0-rc.4'
+VERSION_LABEL = '1.1.0 RC4'
 GAME_VERSION = '1.15.2'
 CULTURES = ['min', 'yue', 'hakka', 'han']
 MATRIX = {
@@ -101,14 +101,10 @@ nym_last_target = {
     for i, (r, c, _) in enumerate(CELLS):
         values += table_value(f'nym_plan_{r}_{c}', [apportion(t)[i] for t in TARGETS])
     values += '''
-# Pop scope: cap against the click-time balance, live population and destination quota.
+# POP scope: read its live size and cap it against the country's destination quota.
 nym_take = {
     value = total_size
     max = scope:nym_country.var:nym_quota
-    if = {
-        limit = { scope:nym_origin_state = { nym_culture_has_receipt = yes } }
-        max = var:nym_available
-    }
     floor = yes
 }
 nym_state_share = {
@@ -204,13 +200,9 @@ nym_execute = {
     set_variable = { name = nym_source_delta value = 0 }
     set_variable = { name = nym_destination_delta value = 0 }
 
-    # Snapshots are only required for a state/culture after it receives migrants.
-    # An unreceived source can safely use its shrinking live POP sizes.
+    # Initial census for the report. The game rejects variables on POP scope.
     every_scope_pop = {
         limit = { nym_culture = yes total_size >= 1 }
-        set_variable = { name = nym_available value = total_size days = 1 }
-        state = { save_scope_as = nym_snapshot_state }
-        set_variable = { name = nym_origin value = scope:nym_snapshot_state days = 1 }
         save_scope_value_as = { name = nym_source_size value = total_size }
         scope:nym_country = {
             change_variable = { name = nym_source_count add = 1 }
@@ -244,12 +236,7 @@ nym_execute = {
         set_global_variable = {{ name = {record} value = var:nym_cell_actual }}
     }}
 '''
-    effects += '''    every_scope_pop = {
-        limit = { has_variable = nym_available }
-        remove_variable = nym_available
-        remove_variable = nym_origin
-    }
-    every_scope_state = { nym_clear_receipts = yes }
+    effects += '''    every_scope_state = { nym_clear_receipts = yes }
     if = {
         limit = { has_variable = nym_transfer_halted }
         remove_variable = nym_transfer_halted
@@ -327,19 +314,11 @@ nym_find_sources = {
                         }
                     }
                     scope:nym_country = { change_variable = { name = nym_culture_candidates add = 1 } }
+                    # After arrivals, the state cannot distinguish old and newly
+                    # merged POPs. Stop using it as a donor for this culture.
                     if = {
                         limit = { scope:nym_origin_state = { nym_culture_has_receipt = no } }
                         nym_transfer = yes
-                    }
-                    else_if = {
-                        limit = { has_variable = nym_available exists = var:nym_origin }
-                        if = {
-                            limit = {
-                                var:nym_available >= 1
-                                var:nym_origin ?= { this = scope:nym_origin_state }
-                            }
-                            nym_transfer = yes
-                        }
                     }
                 }
             }
@@ -364,11 +343,6 @@ nym_transfer = {
 }
 
 nym_move_and_verify = {
-    # Debit original POPs even if their state has not received this culture yet.
-    if = {
-        limit = { has_variable = nym_available }
-        change_variable = { name = nym_available subtract = scope:nym_amount }
-    }
     scope:nym_country = {
         set_variable = { name = nym_source_before value = scope:nym_origin_state.nym_live_population }
         set_variable = { name = nym_destination_before value = scope:nym_destination.nym_live_population }

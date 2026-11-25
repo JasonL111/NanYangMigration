@@ -64,10 +64,17 @@ class Pop:
     culture: str
     size: int
     religion: str = 'confucian'
-    vars: dict = field(default_factory=dict)
+
+
+def scope_variables(obj):
+    if isinstance(obj, Pop):
+        # Reproduce the runtime restriction reported by the game, even though
+        # its generated scope table claimed that POPs could store variables.
+        raise ValueError("This scope doesn't support variables: POP")
+    return obj.vars
 
 class Harness:
-    def __init__(self, mod, *, move=None, ignore_pop_writes=False, ignore_state_writes=False):
+    def __init__(self, mod, *, move=None, ignore_state_writes=False):
         self.defs = {}
         for f in (Path(mod)/'common').rglob('*.txt'):
             for key, _, value in parse(f.read_text(encoding='utf-8-sig')):
@@ -85,8 +92,7 @@ class Harness:
         self.moved = 0
         self.transfers = []
         self.move = move
-        # Fault injection only. It does not assert these faults occur in Victoria 3.
-        self.ignore_pop_writes = ignore_pop_writes
+        # Fault injection for verifying that a missing receipt stops movement.
         self.ignore_state_writes = ignore_state_writes
         self.cached_population = {}
         self.delayed_moves = []
@@ -119,7 +125,7 @@ class Harness:
         if name.startswith('scope:'):
             return self.saved.get(name[6:])
         if name.startswith('var:'):
-            return obj.vars.get(name[4:]) if obj else None
+            return scope_variables(obj).get(name[4:]) if obj is not None else None
         if name.startswith('global_var:'):
             return self.globals.get(name[11:])
         if name in self.defs:
@@ -157,7 +163,7 @@ class Harness:
             elif key == 'exists':
                 result.append(self.resolve(value, obj) is not None)
             elif key == 'has_variable':
-                result.append(value in obj.vars)
+                result.append(value in scope_variables(obj))
             elif key == 'has_global_variable':
                 result.append(value in self.globals)
             elif key in self.defs and key.startswith(('nym_culture', 'nym_eligible')):
@@ -229,24 +235,21 @@ class Harness:
                 elif operator != '?=':
                     raise ValueError('Invalid required scope: ' + key)
             elif key in ('set_variable', 'set_global_variable'):
-                if key == 'set_variable' and (
-                    (isinstance(obj, Pop) and self.ignore_pop_writes)
-                    or (isinstance(obj, State) and self.ignore_state_writes)
-                ):
+                if key == 'set_variable' and isinstance(obj, State) and self.ignore_state_writes:
                     continue
-                store = self.globals if key == 'set_global_variable' else obj.vars
+                store = self.globals if key == 'set_global_variable' else scope_variables(obj)
                 if not f:
                     store[value] = True
                     continue
                 store[f['name']] = self.resolve(f.get('value', 'yes'), obj)
                 if 'years' in f: self.durations[f['name']] = ('years', int(f['years']))
             elif key in ('change_variable', 'change_global_variable'):
-                store = self.globals if key == 'change_global_variable' else obj.vars
+                store = self.globals if key == 'change_global_variable' else scope_variables(obj)
                 operation = next(x for x in f if x != 'name')
                 val = self.resolve(f[operation], obj)
                 store[f['name']] += val if operation == 'add' else -val
             elif key == 'remove_variable':
-                obj.vars.pop(value, None)
+                scope_variables(obj).pop(value, None)
             elif key == 'remove_global_variable':
                 self.globals.pop(value, None)
             elif key == 'save_scope_as':
