@@ -1,0 +1,19 @@
+namespace = overseas_chinese_mobilization
+
+overseas_chinese_mobilization.1 = {
+    type = country_event
+    title = ocm_success_title
+    desc = ocm_success_desc
+    is_popup = yes
+    event_image = { texture = "gfx/event_pictures/ocm_guild_hall.dds" }
+    option = { name = ocm_success_ack }
+}
+
+overseas_chinese_mobilization.2 = {
+    type = country_event
+    title = ocm_no_recognition_title
+    desc = ocm_no_recognition_desc
+    is_popup = yes
+    event_image = { texture = "gfx/event_pictures/ocm_guild_hall.dds" }
+    option = { name = ocm_no_recognition_ack }
+}

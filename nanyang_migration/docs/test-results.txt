@@ -26,6 +26,7 @@ test_stale_state_aggregates_do_not_mask_immediate_move (test_mod.Execution.test_
 test_unbalanced_population_stops (test_mod.Execution.test_unbalanced_population_stops) ... ok
 test_verified_partial_move_counts_measured_amount (test_mod.Execution.test_verified_partial_move_counts_measured_amount) ... ok
 test_zero_no_use_or_cooldown (test_mod.Execution.test_zero_no_use_or_cooldown) ... ok
+test_all_result_events_reference_the_packaged_harbor_art (test_mod.Files.test_all_result_events_reference_the_packaged_harbor_art) ... ok
 test_all_scripts_parse_and_no_empty_files (test_mod.Files.test_all_scripts_parse_and_no_empty_files) ... ok
 test_definition_references (test_mod.Files.test_definition_references) ... ok
 test_localizations (test_mod.Files.test_localizations) ... ok
@@ -40,6 +41,6 @@ test_matrix (test_mod.Mathematics.test_matrix) ... ok
 test_rounding_from_emitted_values (test_mod.Mathematics.test_rounding_from_emitted_values) ... ok
 
 ----------------------------------------------------------------------
-Ran 39 tests
+Ran 40 tests
 
 OK

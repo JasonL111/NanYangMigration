@@ -10,7 +10,7 @@ import zipfile
 from build_mod import ROOT, MOD
 from build_probe import PROBE
 
-PACKAGED_DIRS = {'.metadata', 'common', 'events', 'localization', 'docs'}
+PACKAGED_DIRS = {'.metadata', 'common', 'events', 'gfx', 'localization', 'docs'}
 
 def file_digest(data):
     return hashlib.sha256(data).hexdigest()
