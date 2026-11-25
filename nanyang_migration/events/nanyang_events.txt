@@ -13,3 +13,10 @@ nanyang_migration.2 = {
     is_popup = yes
     option = { name = nym_ack }
 }
+nanyang_migration.3 = {
+    type = country_event
+    title = nym_pending_title
+    desc = nym_pending_desc
+    is_popup = yes
+    option = { name = nym_ack }
+}

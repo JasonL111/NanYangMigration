@@ -1,5 +1,4 @@
 import copy
-import hashlib
 import json
 from pathlib import Path
 import re
@@ -10,10 +9,14 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'tools'))
 from build_mod import CULTURES, MATRIX, TARGETS, REGIONS, CELLS, apportion
 from script_harness import Harness, Country, State, Pop, parse, fields
+from build_probe import PROBE, MODES
 MOD = ROOT / 'nanyang_migration'
 
-def world(uses=0, available=10_000_000, split=1, religion='confucian'):
-    h = Harness(MOD)
+def immediate(h, pop, destination, amount):
+    h.apply_move(pop, destination, amount)
+
+def world(uses=0, available=10_000_000, split=1, religion='confucian', move=immediate):
+    h = Harness(MOD, move=move)
     h.globals['nym_uses'] = uses
     source = State('BEIJING', h.country)
     h.states.append(source)
@@ -27,8 +30,8 @@ def world(uses=0, available=10_000_000, split=1, religion='confucian'):
 class Files(unittest.TestCase):
     def test_metadata(self):
         d = json.loads((MOD/'.metadata/metadata.json').read_text())
-        self.assertEqual(d['version'], '1.0.2')
-        self.assertEqual(d['supported_game_version'], '1.13.11')
+        self.assertEqual(d['version'], '1.1.0-rc.1')
+        self.assertEqual(d['supported_game_version'], '1.15.2')
 
     def test_all_scripts_parse_and_no_empty_files(self):
         for f in MOD.rglob('*'):
@@ -49,10 +52,15 @@ class Files(unittest.TestCase):
             keys.append(set(k for k, _ in entries))
         self.assertEqual(*keys)
         required = {'je_nanyang_migration', 'je_nanyang_migration_reason'}
-        for f in MOD.rglob('*.txt'):
-            required.update(re.findall(r'\b(?:name|desc|title|text)\s*=\s*(nym_\w+)\b', f.read_text()))
-        # Numeric variable names are not localisation references.
-        required = {x for x in required if x not in {'nym_uses','nym_last','nym_last_target','nym_requested','nym_actual','nym_cell_unassigned','nym_states_left','nym_cell_actual','nym_quota','nym_delta','nym_before','nym_available','nym_origin','nym_amount','nym_cooldown','nym_source_count','nym_source_size','nym_source_people','nym_transfer_calls','nym_transfer_requested'} and not x.startswith(('nym_count_', 'nym_actual_'))}
+        for f in (MOD/'events').glob('*.txt'):
+            for _, _, block in parse(f.read_text()):
+                if isinstance(block, list):
+                    event = fields(block)
+                    required.update([event['title'], event['desc'], fields(event['option'])['name']])
+        button = fields(parse((MOD/'common/scripted_buttons/nanyang_buttons.txt').read_text())[0][2])
+        required.update([button['name'], button['desc']])
+        for f in (MOD/'common/scripted_buttons').glob('*.txt'):
+            required.update(re.findall(r'\b(?:text|custom_tooltip)\s*=\s*(nym_\w+)\b', f.read_text()))
         self.assertLessEqual(required, keys[0])
 
     def test_definition_references(self):
@@ -68,11 +76,14 @@ class Files(unittest.TestCase):
         events = parse((MOD/'events/nanyang_events.txt').read_text())
         ids = {k for k,_,_ in events}
         self.assertLessEqual(set(re.findall(r'id\s*=\s*(nanyang_migration\.\d+)', text)), ids)
-        self.assertNotIn('$', text.replace('$REGION$', '').replace('$CULTURE$', '').replace('$AMOUNT$', ''))
+        self.assertEqual(set(re.findall(r'\$([A-Z_]+)\$', text)),
+                         {'AMOUNT', 'COUNT', 'DESTINATIONS', 'CULTURE', 'SOURCES', 'CELL_RECORD'})
 
     def test_versioned_identifiers(self):
         evidence = json.loads((MOD/'docs/reference_ids.json').read_text())
+        self.assertEqual(evidence['target_version'], '1.15.2')
         self.assertEqual(evidence['version'], '1.13.11 (Matcha)')
+        self.assertEqual(evidence['target_game_data_status'], 'requires local snapshot')
         self.assertLessEqual(set(CULTURES), set(evidence['cultures']))
         self.assertIn('CHI', evidence['countries'])
         for names in REGIONS.values():
@@ -80,6 +91,21 @@ class Files(unittest.TestCase):
         all_states = [s for names in REGIONS.values() for s in names]
         self.assertEqual(len(all_states), len(set(all_states)))
         self.assertIn('NAKHON_RATCHASIMA', REGIONS['siam'])
+
+    def test_native_probe_uses_one_guarded_call_per_mode(self):
+        button_file = PROBE / 'common/scripted_buttons/nanyang_probe.txt'
+        effects_file = PROBE / 'common/scripted_effects/nanyang_probe.txt'
+        for f in (PROBE/'common').rglob('*.txt'):
+            parse(f.read_text())
+        parse((PROBE/'events/nanyang_probe.txt').read_text())
+        buttons = parse(button_file.read_text())
+        self.assertEqual(len(buttons), len(MODES))
+        for _, _, block in buttons:
+            self.assertIn('has_global_variable', repr(fields(block)['possible']))
+        for mode, arg in MODES.items():
+            self.assertIn('nyp_test_'+mode, effects_file.read_text())
+            self.assertIn('state = scope:nyp_destination '+arg, effects_file.read_text())
+        self.assertEqual(effects_file.read_text().count('move_partial_pop ='), len(MODES))
 
     def test_no_fake_population_creation(self):
         text = '\n'.join(f.read_text() for f in MOD.rglob('*.txt'))
@@ -92,8 +118,8 @@ class Files(unittest.TestCase):
     def test_native_timer_and_permanent_journal(self):
         h = Harness(MOD)
         j = fields(h.defs['je_nanyang_migration'])
-        self.assertFalse(h.condition(j['complete'], h.country))
-        self.assertFalse(h.condition(j['fail'], h.country))
+        self.assertEqual(j['context'], 'country')
+        self.assertFalse({'complete', 'fail', 'invalid', 'outcome', 'timeout'} & j.keys())
         text = (MOD/'common/scripted_effects/nanyang_effects.txt').read_text()
         self.assertIn('name = nym_cooldown value = yes years = 5', text)
         self.assertNotIn('days = 1825', text)
@@ -101,8 +127,7 @@ class Files(unittest.TestCase):
 
 class Mathematics(unittest.TestCase):
     def test_jomini_bounds_semantics(self):
-        # Vanilla 00_diplomacy_values.txt clamps to [0.01, 0.05] with
-        # min = 0.01, max = 0.05; these are bounds, not Python min()/max().
+        # The 1.15 script_values type documentation defines these bounds.
         h = Harness(MOD)
         self.assertEqual(h.formula(parse('value = 100 max = 7'), h.country), 7)
         self.assertEqual(h.formula(parse('value = -2 min = 0'), h.country), 0)
@@ -134,6 +159,78 @@ class Mathematics(unittest.TestCase):
                 self.assertLess(abs(amount-target*weight/100), 1)
 
 class Execution(unittest.TestCase):
+    def test_stale_state_aggregates_do_not_mask_immediate_move(self):
+        h = world()
+        h.cached_population = {s: h.population(s) for s in h.states}
+        h.click()
+        self.assertEqual(h.globals['nym_last'], 2_000_000)
+        self.assertNotIn('nym_pending', h.globals)
+
+    def test_delayed_move_locks_attempt_and_successor(self):
+        h = world(move=lambda h, p, d, n: h.delayed_moves.append((p, d, n)))
+        h.click()
+        self.assertEqual(h.events, ['nanyang_migration.3'])
+        self.assertEqual(h.country.vars['nym_transfer_calls'], 1)
+        self.assertEqual(h.globals['nym_uses'], 0)
+        self.assertNotIn('nym_cooldown', h.globals)
+        self.assertIn('nym_pending', h.globals)
+        h.tick()
+        self.assertGreater(h.moved, 0)
+        h.globals = copy.deepcopy(h.globals)
+        h.country = Country()
+        h.click()
+        self.assertEqual(h.events, ['nanyang_migration.3'])
+
+    def test_native_no_op_is_unconfirmed_and_preserves_history(self):
+        h = world(move=lambda *_: None)
+        h.globals.update(nym_last=123, nym_last_target=456)
+        h.click()
+        h.click()
+        self.assertEqual(h.country.vars['nym_transfer_calls'], 1)
+        self.assertEqual(h.events, ['nanyang_migration.3'])
+        self.assertEqual(h.globals['nym_last'], 123)
+        self.assertEqual(h.globals['nym_last_target'], 456)
+        self.assertEqual(h.globals['nym_uses'], 0)
+
+    def test_unbalanced_population_stops(self):
+        def source_only(h, pop, destination, amount):
+            pop.size -= amount
+        h = world(move=source_only)
+        h.click()
+        self.assertEqual(h.events, ['nanyang_migration.3'])
+        self.assertEqual(h.country.vars['nym_transfer_calls'], 1)
+        self.assertGreater(h.country.vars['nym_source_delta'], 0)
+        self.assertEqual(h.country.vars['nym_destination_delta'], 0)
+        self.assertIn('nym_pending', h.globals)
+
+    def test_verified_partial_move_counts_measured_amount(self):
+        h = world(move=lambda h, p, d, n: h.apply_move(p, d, n // 2))
+        h.click()
+        self.assertEqual(h.moved, 1_000_000)
+        self.assertEqual(h.globals['nym_last'], h.moved)
+        self.assertEqual(h.country.vars['nym_transfer_requested'], 2_000_000)
+
+    def test_over_request_stops_and_does_not_commit(self):
+        h = world(move=lambda h, p, d, n: h.apply_move(p, d, n + 1))
+        h.click()
+        self.assertEqual(h.events, ['nanyang_migration.3'])
+        self.assertEqual(h.country.vars['nym_transfer_calls'], 1)
+        self.assertGreater(h.country.vars['nym_destination_delta'], h.country.vars['nym_last_request'])
+        self.assertNotIn('nym_last', h.globals)
+
+    def test_country_qualification(self):
+        h = world()
+        eligible = h.defs['nym_eligible']
+        self.assertTrue(h.condition(eligible, h.country))
+        h.country = Country('cd:DYN', origin=Country())
+        self.assertTrue(h.condition(eligible, h.country))
+        h.country = Country('cd:DYN')
+        self.assertFalse(h.condition(eligible, h.country))
+        h.globals['chinese_central_government'] = h.country
+        self.assertTrue(h.condition(eligible, h.country))
+        h.country.player = False
+        self.assertFalse(h.condition(eligible, h.country))
+
     def test_diagnostic_counters(self):
         h = world()
         h.click()

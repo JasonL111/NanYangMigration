@@ -1,6 +1,6 @@
-# 下南洋 · Nanyang Migration 1.0.2
+# 下南洋 · Nanyang Migration 1.1.0 RC1
 
-目标版本：**Victoria 3 1.13.11 (Matcha)**。原生 Paradox Script，运行时无外部依赖。
+目标版本：**Victoria 3 1.15.2**。原生 Paradox Script，运行时无外部依赖。
 这是已生成并通过静态/模拟执行检查的安装候选包；本环境没有游戏，
 **尚未验证引擎加载、真实 POP 数量、保存重载与计时行为，不能声称游戏内验收已通过**。
 
@@ -27,7 +27,7 @@
 
 1836 年以大清开始，查看日志中的长期条目“下南洋”，点击“组织下南洋”。
 条目不会自动完成或失败。新激活条目取决于游戏正常的日志评估周期。
-按钮仅对玩家开放，AI 权重为零。暂停时执行同步迁移逻辑，不等待普通移民吸引力。
+按钮仅对玩家开放，AI 权重为零。点击时调用原生直接迁移。即时读数能否在暂停中完整更新，请查阅诊断步骤。
 无需市场连接、外交协议或目的地所有权。
 
 国家判断使用 `country_definition = cd:CHI`，所以大清、共和国、人民共和国的动态名称
@@ -37,7 +37,7 @@
 
 日志显示累计成功次数、当前计划、上次目标、上次实际完成量以及本次成功后的下一次目标。
 按钮条件显示冷却是否满足；不添加自定义 GUI，也不声称显示未经验证的冷却结束日期。
-点击后弹出成功或零迁移结果通知。零迁移时按钮可继续尝试，但不消耗冷却或成功次数。
+结果分为已确认成功、未调用转移、待确认。未发出转移请求时可重试。调用后结果仍待确认时，存档会保留操作锁。
 
 ## 精确设计参数
 
@@ -75,11 +75,20 @@
 从 `total_size` 读取来源额度，不将 workforce 误作总人口。
 原生规则会让迁入者失业，或使不能失业/不允许的奴隶职业转为默认职业。
 
-实际量以每笔转移前后的目标州 `state_population` 差额记录，不将请求人数直接充当完成量。
-只有实际量大于零才增加成功次数并设置 `years = 5` 的持久化冷却变量。
-请求值为整数；**`population` 在 1.13.11 中的总人口/劳动力单位、引擎拆分取整和
-州统计是否同步刷新仍需游戏实测**。公开生成文档说明支持该参数，未给出足够证据验证
-这些实现细节，因此自动测试中的精确人数不构成真实引擎的精度保证。
+每笔请求限制为当时 POP 大小、点击时剩余来源预算、目的州额度中的最小值。发出请求前
+扣减来源快照预算，避免合并扩充额度。完成后分别重扫两个州该文化的 POP，来源减少量和
+目的增加量必须为相同的正数，且不超过请求量，才计入实际总量。若原生效果少移且两端读数
+一致，按实测值结算。出处不足时，已发出的请求占用来源预算，即使引擎只执行了一部分，
+因此极端拆分情况下可更保守地少移一部分。
+
+任何一笔无法核对时，中止余下调用，保留全局 `nym_pending`。这需要加载点击前的
+存档才能重新尝试。等待游戏日推进不会自动认定到账或解除锁定，因为正常人口变化
+也会改变读数。确认整批成功后增加一次成功次数，启动 `years = 5` 冷却，更新记录。
+全程没有发出请求的批次不更新成功记录或冷却。
+
+公开原生文档确认 `move_partial_pop` 的 POP 作用域与三种写法。1.15.2 下 `population`
+是否含家属、即时 POP 读数、跨国限制、完整拆分/合并细节留给独立小额诊断验证。
+若引擎按照与原计划不同的单位移动，脚本能拦截后续操作，已发生的第一笔原生调动没有回滚接口。
 
 来源不足时减量，不跨文化补足；目的区域无有效拥有者时整格跳过，不跨地区改派。
 来源和目的为同一实际州时跳过；某目的州无法从其他来源补齐时保留缺额。
@@ -92,9 +101,9 @@
 继承国也共享次数和冷却，不是每玩家一套。失败不覆盖上次成功总记录；
 `nym_actual_<区域>_<文化>` 是最近一次尝试的逐格实际记录，失败尝试可将其更新为0。
 
-## 地理映射（1.13.11 公开数据核对）
+## 地理映射（保留设计 ID）
 
-完整 ID 保存在 `docs/design.json` 和 `common/scripted_triggers/nanyang_triggers.txt`。
+完整 ID 保存在 `docs/design.json` 和生成的 `common/scripted_effects/nanyang_effects.txt`。公开 1.15 差异未列出这些 ID 的改名，但目标地图文件在 1.15.1 有修改，新版原始数据的逐项验证仍待执行。
 
 - 马来亚及新加坡：MALAYA，包含该 Region 内所有实际分割州，非独立 Singapore ID。
 - 荷属东印度：ACEH、NORTH_SUMATRA、SOUTH_SUMATRA、WEST_JAVA、CENTRAL_JAVA、EAST_JAVA、
@@ -119,37 +128,17 @@
 修改地图、文化、国家定义、日志系统或人口效果的 Mod 需要重新核对兼容性。
 脚本集合会改变校验和；不要假定兼容成就或多人未统一的 Mod 播放集。
 
-## 游戏内验收步骤
+## 升级与游戏内验收
 
-启用 `-debug_mode` 后建立1836年大清新档，待日志激活，在暂停状态下记录四文化来源总人口
-及各目标州人口，点击一次，核对迁出/迁入、逐格统计、总目标2,000,000和实际完成量。
-检查用户数据 `logs/error.log` 中本次加载产生的 `nanyang`/`nym_`/脚本报错。
-再做立即二次点击、保存退出重载、经过5个游戏年后的二次点击，检查2,500,000目标。
-在测试档备份后，用调试控制台 `effect remove_global_variable = nym_cooldown` 仅移除
-冷却，可依次核对第3至第7次目标；此命令不是正常玩法的一部分。
-还需测试缺文化、缺目标州、分割州、革命继承、同国目标、人口单位及原生拆分/合并精度。
-任何效果要求精度或 scope 报错，均应以真实错误日志和前后 POP 数据修正，不能以模型通过代替。
+1. 完全退出游戏，移除旧 Mod 目录再解压新版，确保播放集中只启用一个正式版本。
+2. 用 1.15.2 新建 1836 大清备份测试档。打开“下南洋”，检查按钮和 200 万计划。先做独立小额诊断可确认原生迁移行为，见仓库的诊断 ZIP。
+3. 在测试档点击一次正式按钮，核对结果、弹窗中的末笔请求及两端人口差额，并比较来源和目的州的文化人口。核对累计成功为 1、下次目标为 250 万、五年冷却和保存重载。
+4. 若显示“迁移待确认”，保留操作前存档和完整弹窗。一次性提供游戏版本/校验码、Mod 版本、弹窗、同次运行的 `logs/error.log` 和独立诊断报告。必要时提供点击前后的人口界面截图。
+
+旧游戏版本存档升级取决于游戏自身兼容性，本候选版未实测。旧 Mod 的 `nym_uses`、`nym_cooldown`、最近成功记录继续读取，旧暂存数据不参与新操作。1.0.0–1.0.2 的零记录可能对应已发生的移动。优先以旧版第一次点击之前的备份验证。由于没有可靠的旧迁移账目，此版本不能自动恢复旧版人口。
+
+开发与校验命令见仓库根目录 [README](../README.md)。已知缺陷、限制及版本差异见 [兼容性调查](docs/COMPATIBILITY_1_15.md) 与 [验证报告](docs/VALIDATION.md)。
 
 ## English installation summary
 
-Extract the complete `nanyang_migration` folder into your Victoria 3 user-data `mod` directory,
-preserving `.metadata/metadata.json`. Reload local mods in the Launcher, add it to a playset and
-enable it. If local discovery is unavailable, register a local mod through the Launcher's Mod tools,
-then copy the content folders into that mod and retain its generated registration metadata.
-Start as China and use the permanent Journal button. English and Simplified Chinese are provided.
-Target: 1.13.11; native-engine loading and gameplay have **not** been tested in this cloud environment.
-
-## 1.0.1 更新须知
-
-修复原生Script Value的min/max上下界反用，包含迁入统计归零与抽取量超限两处。
-1.0.0显示失败也可能已经迁移了人口，请优先载入点击之前的存档。
-完全退出游戏后删除旧Mod目录，再解压新版覆盖安装，避免两个版本同时启用。
-本版经24项静态/模拟测试，尚无游戏内实测。
-
-## 1.0.2 诊断版
-
-用户反馈1.0.1仍报告零迁移，目前未确定剩余断点。此版不宣称已修复剩余问题。
-结果弹窗明确显示版本、来源POP数与总人口、六组目标州数、原生转移调用次数、
-请求量合计和实际记录量。若仍失败，请提供完整弹窗和本次error.log及游戏版本。
-若仍看到旧的“可能缺少四种文化”弹窗，说明当前读取的不是此版本地化。
-请仅在备份测试存档上点击一次；零记录不能证明游戏人口没有改变。
+Target: Victoria 3 1.15.2, release candidate 1.1.0 RC1. Extract the complete `nanyang_migration` folder into the game's user-data `mod` directory, keeping `.metadata/metadata.json`. Enable it in a Launcher playset. No DLC or runtime dependencies are required. Use a backed-up new Qing save. If the report says “Transfer Unconfirmed”, reload the pre-attempt save for another test and retain the report and game log. Engine acceptance remains pending.

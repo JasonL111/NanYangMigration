@@ -1,0 +1,11 @@
+{
+  ".metadata/metadata.json": "6558560138c7fb76e525e0b83ab12e2da0bb53b8e015c577096128cc93cf3ab4",
+  "README.md": "1edf6c645c3cfc6f88732ce1584d41d61eb321f46d30d2252ad1d318c3350a46",
+  "common/journal_entries/nanyang_probe.txt": "d4e65cfdfc3526a9c4c760e3e4d59455a6bd2e081d8ae2edcb666a8f59b2175e",
+  "common/script_values/nanyang_probe.txt": "f94797c6ed1de9d2dd9c6ef937ecbd2a968661d09a09838865cdc77809f382ab",
+  "common/scripted_buttons/nanyang_probe.txt": "2c091cb548aabaca722f92bf811278b8311bde40ac16e4f0bc9ddac35be5ed7d",
+  "common/scripted_effects/nanyang_probe.txt": "63a60c9553b4953181053a312931515b06db6f5bfaaac10e34b8533188922431",
+  "events/nanyang_probe.txt": "0dbabf3970353fc4ae9f821055c031a55392deb39b0d5f4d8a509160e766c993",
+  "localization/english/nanyang_probe_l_english.yml": "05a4b547864c4246a72a4a42b696a1c8a3f26830e5dfa0618804823a22713fb6",
+  "localization/simp_chinese/nanyang_probe_l_simp_chinese.yml": "46aa94d419c7d4bc53752720eb064145a11e456e7d64875a1d7a81edf57e4189"
+}

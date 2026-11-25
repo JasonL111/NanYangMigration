@@ -1,15 +1,20 @@
 # 下南洋 / Nanyang Migration
 
-Victoria 3 原生脚本 Mod，版本 **1.0.2**，目标游戏版本 **1.13.11 (Matcha)**。
+**1.1.0 RC1**，目标游戏版本 **Victoria 3 1.15.2**。玩家可组织中国人口迁往南洋。使用原生 Paradox Script，安装与游戏运行无需 Python，无额外 DLC 要求。候选版已核对版本化脚本文档、通过静态和场景测试，真实引擎验收待完成。
 
-- 安装目录：[nanyang_migration](nanyang_migration/)
-- 安装包：`nanyang_migration.zip`
-- 安装、机制及限制：[Mod README](nanyang_migration/README.md)
-- 验证报告：[VALIDATION.md](nanyang_migration/docs/VALIDATION.md)
+- 正式玩法候选包：[nanyang_migration.zip](nanyang_migration.zip) · [SHA-256](nanyang_migration.zip.sha256)
+- 独立小额诊断包：[nanyang_native_probe.zip](nanyang_native_probe.zip) · [SHA-256](nanyang_native_probe.zip.sha256)
+- [安装、迁移机制与旧档](nanyang_migration/README.md) · [改动记录](nanyang_migration/docs/CHANGELOG.md)
+- [1.15 兼容性调查](nanyang_migration/docs/COMPATIBILITY_1_15.md) · [原生脚本证据](nanyang_migration/docs/NATIVE_SCRIPT_REFERENCE.md) · [验证报告](nanyang_migration/docs/VALIDATION.md)
 
-开发验证使用 `python3 -m unittest discover -s tests -v`。生成脚本为
-`python3 tools/build_mod.py`，仅重建游戏脚本和数据表，不覆盖手写说明与验证证据。
-游戏运行不需要 Python。没有修改游戏本体，也没有提交或推送 Git。
+开发命令，从仓库根目录运行：
 
-注意：本仓库产物已做静态和模拟执行测试，当前云环境没有 Victoria 3，
-没有执行引擎加载及真实存档测试。请阅读验证报告中的未验证项。
+```sh
+python3 tools/build_mod.py
+python3 tools/build_probe.py
+python3 -m unittest discover -s tests -v
+python3 tools/package_mod.py
+sha256sum -c nanyang_migration.zip.sha256 nanyang_native_probe.zip.sha256
+```
+
+Windows 可对 ZIP 使用 PowerShell `Get-FileHash -Algorithm SHA256`，与相应 `.sha256` 文件核对。游戏本体文件从未纳入安装包。

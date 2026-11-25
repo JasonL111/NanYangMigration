@@ -1,4 +1,4 @@
-# All counts are persons, not workforce. Explicit schedule avoids iterative rounding drift.
+# The design budgets use persons. Native move units require the engine probe.
 nym_uses = {
     value = 0
     if = { limit = { has_global_variable = nym_uses } value = global_var:nym_uses }
@@ -184,8 +184,19 @@ nym_state_share = {
     divide = var:nym_states_left
     floor = yes
 }
+# Iterate actual POP objects. Avoid relying on the state's aggregate cache.
+nym_live_population = {
+    value = 0
+    every_scope_pop = {
+        limit = { culture = scope:nym_country.var:nym_current_culture }
+        add = total_size
+    }
+}
+nym_source_delta = {
+    value = var:nym_source_before
+    subtract = scope:nym_origin_state.nym_live_population
+}
 nym_destination_delta = {
-    value = scope:nym_destination.state_population
-    subtract = var:nym_before
-    min = 0
+    value = scope:nym_destination.nym_live_population
+    subtract = var:nym_destination_before
 }

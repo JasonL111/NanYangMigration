@@ -1,0 +1,334 @@
+nyp_test_literal = {
+    save_scope_as = nyp_actor
+    s:STATE_MALAYA ?= {
+        random_scope_state = {
+            limit = { exists = owner NOT = { owner = scope:nyp_actor } }
+            save_scope_as = nyp_destination
+        }
+    }
+    if = {
+        limit = { exists = scope:nyp_destination }
+        random_scope_pop = {
+            limit = { culture = cu:min total_size >= 1000 total_size <= 10000 workforce >= 1 dependents >= 1 }
+            save_scope_as = nyp_pop
+            state = { save_scope_as = nyp_source }
+        }
+    }
+    if = {
+        limit = { exists = scope:nyp_pop }
+        set_global_variable = { name = nyp_started value = yes }
+        nyp_sample_before = yes
+        save_scope_value_as = { name = nyp_amount value = 100 }
+        scope:nyp_pop = { move_partial_pop = { state = scope:nyp_destination population = 100 } }
+        nyp_sample_after = yes
+        trigger_event = { id = nanyang_native_probe.1 }
+        trigger_event = { id = nanyang_native_probe.2 days = 1 }
+    }
+    else = { trigger_event = { id = nanyang_native_probe.3 } }
+}
+
+nyp_test_dynamic = {
+    save_scope_as = nyp_actor
+    s:STATE_MALAYA ?= {
+        random_scope_state = {
+            limit = { exists = owner NOT = { owner = scope:nyp_actor } }
+            save_scope_as = nyp_destination
+        }
+    }
+    if = {
+        limit = { exists = scope:nyp_destination }
+        random_scope_pop = {
+            limit = { culture = cu:min total_size >= 1000 total_size <= 10000 workforce >= 1 dependents >= 1 }
+            save_scope_as = nyp_pop
+            state = { save_scope_as = nyp_source }
+        }
+    }
+    if = {
+        limit = { exists = scope:nyp_pop }
+        set_global_variable = { name = nyp_started value = yes }
+        nyp_sample_before = yes
+        save_scope_value_as = { name = nyp_amount value = 100 }
+        scope:nyp_pop = { move_partial_pop = { state = scope:nyp_destination population = scope:nyp_amount } }
+        nyp_sample_after = yes
+        trigger_event = { id = nanyang_native_probe.1 }
+        trigger_event = { id = nanyang_native_probe.2 days = 1 }
+    }
+    else = { trigger_event = { id = nanyang_native_probe.3 } }
+}
+
+nyp_test_ratio = {
+    save_scope_as = nyp_actor
+    s:STATE_MALAYA ?= {
+        random_scope_state = {
+            limit = { exists = owner NOT = { owner = scope:nyp_actor } }
+            save_scope_as = nyp_destination
+        }
+    }
+    if = {
+        limit = { exists = scope:nyp_destination }
+        random_scope_pop = {
+            limit = { culture = cu:min total_size >= 1000 total_size <= 10000 workforce >= 1 dependents >= 1 }
+            save_scope_as = nyp_pop
+            state = { save_scope_as = nyp_source }
+        }
+    }
+    if = {
+        limit = { exists = scope:nyp_pop }
+        set_global_variable = { name = nyp_started value = yes }
+        nyp_sample_before = yes
+        save_scope_value_as = { name = nyp_amount value = 100 }
+        scope:nyp_pop = { move_partial_pop = { state = scope:nyp_destination population_ratio = 0.1 } }
+        nyp_sample_after = yes
+        trigger_event = { id = nanyang_native_probe.1 }
+        trigger_event = { id = nanyang_native_probe.2 days = 1 }
+    }
+    else = { trigger_event = { id = nanyang_native_probe.3 } }
+}
+
+nyp_test_whole = {
+    save_scope_as = nyp_actor
+    s:STATE_MALAYA ?= {
+        random_scope_state = {
+            limit = { exists = owner NOT = { owner = scope:nyp_actor } }
+            save_scope_as = nyp_destination
+        }
+    }
+    if = {
+        limit = { exists = scope:nyp_destination }
+        random_scope_pop = {
+            limit = { culture = cu:min total_size >= 1 total_size <= 1000 workforce >= 1 dependents >= 1 }
+            save_scope_as = nyp_pop
+            state = { save_scope_as = nyp_source }
+        }
+    }
+    if = {
+        limit = { exists = scope:nyp_pop }
+        set_global_variable = { name = nyp_started value = yes }
+        nyp_sample_before = yes
+        save_scope_value_as = { name = nyp_amount value = 100 }
+        scope:nyp_pop = { move_partial_pop = { state = scope:nyp_destination  } }
+        nyp_sample_after = yes
+        trigger_event = { id = nanyang_native_probe.1 }
+        trigger_event = { id = nanyang_native_probe.2 days = 1 }
+    }
+    else = { trigger_event = { id = nanyang_native_probe.3 } }
+}
+
+nyp_sample_before = {
+    set_variable = { name = nyp_before_source_cache value = -1 }
+    if = {
+        limit = { exists = scope:nyp_source }
+        set_variable = { name = nyp_before_source_cache value = scope:nyp_source.state_population }
+    }
+    set_variable = { name = nyp_before_source_live value = -1 }
+    if = {
+        limit = { exists = scope:nyp_source }
+        set_variable = { name = nyp_before_source_live value = scope:nyp_source.nyp_live }
+    }
+    set_variable = { name = nyp_before_source_work value = -1 }
+    if = {
+        limit = { exists = scope:nyp_source }
+        set_variable = { name = nyp_before_source_work value = scope:nyp_source.nyp_work }
+    }
+    set_variable = { name = nyp_before_source_deps value = -1 }
+    if = {
+        limit = { exists = scope:nyp_source }
+        set_variable = { name = nyp_before_source_deps value = scope:nyp_source.nyp_deps }
+    }
+    set_variable = { name = nyp_before_source_objects value = -1 }
+    if = {
+        limit = { exists = scope:nyp_source }
+        set_variable = { name = nyp_before_source_objects value = scope:nyp_source.nyp_objects }
+    }
+    set_variable = { name = nyp_before_destination_cache value = -1 }
+    if = {
+        limit = { exists = scope:nyp_destination }
+        set_variable = { name = nyp_before_destination_cache value = scope:nyp_destination.state_population }
+    }
+    set_variable = { name = nyp_before_destination_live value = -1 }
+    if = {
+        limit = { exists = scope:nyp_destination }
+        set_variable = { name = nyp_before_destination_live value = scope:nyp_destination.nyp_live }
+    }
+    set_variable = { name = nyp_before_destination_work value = -1 }
+    if = {
+        limit = { exists = scope:nyp_destination }
+        set_variable = { name = nyp_before_destination_work value = scope:nyp_destination.nyp_work }
+    }
+    set_variable = { name = nyp_before_destination_deps value = -1 }
+    if = {
+        limit = { exists = scope:nyp_destination }
+        set_variable = { name = nyp_before_destination_deps value = scope:nyp_destination.nyp_deps }
+    }
+    set_variable = { name = nyp_before_destination_objects value = -1 }
+    if = {
+        limit = { exists = scope:nyp_destination }
+        set_variable = { name = nyp_before_destination_objects value = scope:nyp_destination.nyp_objects }
+    }
+    set_variable = { name = nyp_before_object_live value = -1 }
+    if = {
+        limit = { exists = scope:nyp_pop }
+        set_variable = { name = nyp_before_object_live value = scope:nyp_pop.total_size }
+    }
+    set_variable = { name = nyp_before_object_work value = -1 }
+    if = {
+        limit = { exists = scope:nyp_pop }
+        set_variable = { name = nyp_before_object_work value = scope:nyp_pop.workforce }
+    }
+    set_variable = { name = nyp_before_object_deps value = -1 }
+    if = {
+        limit = { exists = scope:nyp_pop }
+        set_variable = { name = nyp_before_object_deps value = scope:nyp_pop.dependents }
+    }
+    set_variable = { name = nyp_before_object_at_destination value = 0 }
+    if = {
+        limit = { exists = scope:nyp_pop scope:nyp_pop.state = scope:nyp_destination }
+        set_variable = { name = nyp_before_object_at_destination value = 1 }
+    }
+}
+
+nyp_sample_after = {
+    set_variable = { name = nyp_after_source_cache value = -1 }
+    if = {
+        limit = { exists = scope:nyp_source }
+        set_variable = { name = nyp_after_source_cache value = scope:nyp_source.state_population }
+    }
+    set_variable = { name = nyp_after_source_live value = -1 }
+    if = {
+        limit = { exists = scope:nyp_source }
+        set_variable = { name = nyp_after_source_live value = scope:nyp_source.nyp_live }
+    }
+    set_variable = { name = nyp_after_source_work value = -1 }
+    if = {
+        limit = { exists = scope:nyp_source }
+        set_variable = { name = nyp_after_source_work value = scope:nyp_source.nyp_work }
+    }
+    set_variable = { name = nyp_after_source_deps value = -1 }
+    if = {
+        limit = { exists = scope:nyp_source }
+        set_variable = { name = nyp_after_source_deps value = scope:nyp_source.nyp_deps }
+    }
+    set_variable = { name = nyp_after_source_objects value = -1 }
+    if = {
+        limit = { exists = scope:nyp_source }
+        set_variable = { name = nyp_after_source_objects value = scope:nyp_source.nyp_objects }
+    }
+    set_variable = { name = nyp_after_destination_cache value = -1 }
+    if = {
+        limit = { exists = scope:nyp_destination }
+        set_variable = { name = nyp_after_destination_cache value = scope:nyp_destination.state_population }
+    }
+    set_variable = { name = nyp_after_destination_live value = -1 }
+    if = {
+        limit = { exists = scope:nyp_destination }
+        set_variable = { name = nyp_after_destination_live value = scope:nyp_destination.nyp_live }
+    }
+    set_variable = { name = nyp_after_destination_work value = -1 }
+    if = {
+        limit = { exists = scope:nyp_destination }
+        set_variable = { name = nyp_after_destination_work value = scope:nyp_destination.nyp_work }
+    }
+    set_variable = { name = nyp_after_destination_deps value = -1 }
+    if = {
+        limit = { exists = scope:nyp_destination }
+        set_variable = { name = nyp_after_destination_deps value = scope:nyp_destination.nyp_deps }
+    }
+    set_variable = { name = nyp_after_destination_objects value = -1 }
+    if = {
+        limit = { exists = scope:nyp_destination }
+        set_variable = { name = nyp_after_destination_objects value = scope:nyp_destination.nyp_objects }
+    }
+    set_variable = { name = nyp_after_object_live value = -1 }
+    if = {
+        limit = { exists = scope:nyp_pop }
+        set_variable = { name = nyp_after_object_live value = scope:nyp_pop.total_size }
+    }
+    set_variable = { name = nyp_after_object_work value = -1 }
+    if = {
+        limit = { exists = scope:nyp_pop }
+        set_variable = { name = nyp_after_object_work value = scope:nyp_pop.workforce }
+    }
+    set_variable = { name = nyp_after_object_deps value = -1 }
+    if = {
+        limit = { exists = scope:nyp_pop }
+        set_variable = { name = nyp_after_object_deps value = scope:nyp_pop.dependents }
+    }
+    set_variable = { name = nyp_after_object_at_destination value = 0 }
+    if = {
+        limit = { exists = scope:nyp_pop scope:nyp_pop.state = scope:nyp_destination }
+        set_variable = { name = nyp_after_object_at_destination value = 1 }
+    }
+}
+
+nyp_sample_day = {
+    set_variable = { name = nyp_day_source_cache value = -1 }
+    if = {
+        limit = { exists = scope:nyp_source }
+        set_variable = { name = nyp_day_source_cache value = scope:nyp_source.state_population }
+    }
+    set_variable = { name = nyp_day_source_live value = -1 }
+    if = {
+        limit = { exists = scope:nyp_source }
+        set_variable = { name = nyp_day_source_live value = scope:nyp_source.nyp_live }
+    }
+    set_variable = { name = nyp_day_source_work value = -1 }
+    if = {
+        limit = { exists = scope:nyp_source }
+        set_variable = { name = nyp_day_source_work value = scope:nyp_source.nyp_work }
+    }
+    set_variable = { name = nyp_day_source_deps value = -1 }
+    if = {
+        limit = { exists = scope:nyp_source }
+        set_variable = { name = nyp_day_source_deps value = scope:nyp_source.nyp_deps }
+    }
+    set_variable = { name = nyp_day_source_objects value = -1 }
+    if = {
+        limit = { exists = scope:nyp_source }
+        set_variable = { name = nyp_day_source_objects value = scope:nyp_source.nyp_objects }
+    }
+    set_variable = { name = nyp_day_destination_cache value = -1 }
+    if = {
+        limit = { exists = scope:nyp_destination }
+        set_variable = { name = nyp_day_destination_cache value = scope:nyp_destination.state_population }
+    }
+    set_variable = { name = nyp_day_destination_live value = -1 }
+    if = {
+        limit = { exists = scope:nyp_destination }
+        set_variable = { name = nyp_day_destination_live value = scope:nyp_destination.nyp_live }
+    }
+    set_variable = { name = nyp_day_destination_work value = -1 }
+    if = {
+        limit = { exists = scope:nyp_destination }
+        set_variable = { name = nyp_day_destination_work value = scope:nyp_destination.nyp_work }
+    }
+    set_variable = { name = nyp_day_destination_deps value = -1 }
+    if = {
+        limit = { exists = scope:nyp_destination }
+        set_variable = { name = nyp_day_destination_deps value = scope:nyp_destination.nyp_deps }
+    }
+    set_variable = { name = nyp_day_destination_objects value = -1 }
+    if = {
+        limit = { exists = scope:nyp_destination }
+        set_variable = { name = nyp_day_destination_objects value = scope:nyp_destination.nyp_objects }
+    }
+    set_variable = { name = nyp_day_object_live value = -1 }
+    if = {
+        limit = { exists = scope:nyp_pop }
+        set_variable = { name = nyp_day_object_live value = scope:nyp_pop.total_size }
+    }
+    set_variable = { name = nyp_day_object_work value = -1 }
+    if = {
+        limit = { exists = scope:nyp_pop }
+        set_variable = { name = nyp_day_object_work value = scope:nyp_pop.workforce }
+    }
+    set_variable = { name = nyp_day_object_deps value = -1 }
+    if = {
+        limit = { exists = scope:nyp_pop }
+        set_variable = { name = nyp_day_object_deps value = scope:nyp_pop.dependents }
+    }
+    set_variable = { name = nyp_day_object_at_destination value = 0 }
+    if = {
+        limit = { exists = scope:nyp_pop scope:nyp_pop.state = scope:nyp_destination }
+        set_variable = { name = nyp_day_object_at_destination value = 1 }
+    }
+}

@@ -4,6 +4,8 @@ import json
 
 ROOT = Path(__file__).resolve().parents[1]
 MOD = ROOT / 'nanyang_migration'
+VERSION = '1.1.0-rc.1'
+GAME_VERSION = '1.15.2'
 CULTURES = ['min', 'yue', 'hakka', 'han']
 MATRIX = {
     'malaya': [12, 10, 7, 6],
@@ -48,7 +50,7 @@ def table_value(name, nums):
 def main():
     write('.metadata/metadata.json', json.dumps({
         'name': '下南洋 · Nanyang Migration', 'id': 'nanyang_migration',
-        'version': '1.0.2', 'supported_game_version': '1.13.11',
+        'version': VERSION, 'supported_game_version': GAME_VERSION,
         'short_description': 'Player-organized Chinese migration to Southeast Asian states.',
         'tags': ['Gameplay', 'Historical'],
         'relationships': [], 'game_custom_data': {'multiplayer_synchronized': True},
@@ -69,12 +71,8 @@ nym_culture = {
     OR = { culture = cu:min culture = cu:yue culture = cu:hakka culture = cu:han }
 }
 '''
-    for region, states in REGIONS.items():
-        triggers += f'nym_region_{region} = {{\n    exists = owner\n    OR = {{\n'
-        triggers += ''.join(f'        state_region = s:STATE_{s}\n' for s in states)
-        triggers += '    }\n}\n'
     write('common/scripted_triggers/nanyang_triggers.txt', triggers)
-    values = '''# All counts are persons, not workforce. Explicit schedule avoids iterative rounding drift.
+    values = '''# The design budgets use persons. Native move units require the engine probe.
 nym_uses = {
     value = 0
     if = { limit = { has_global_variable = nym_uses } value = global_var:nym_uses }
@@ -105,23 +103,34 @@ nym_state_share = {
     divide = var:nym_states_left
     floor = yes
 }
+# Iterate actual POP objects. Avoid relying on the state's aggregate cache.
+nym_live_population = {
+    value = 0
+    every_scope_pop = {
+        limit = { culture = scope:nym_country.var:nym_current_culture }
+        add = total_size
+    }
+}
+nym_source_delta = {
+    value = var:nym_source_before
+    subtract = scope:nym_origin_state.nym_live_population
+}
 nym_destination_delta = {
-    value = scope:nym_destination.state_population
-    subtract = var:nym_before
-    min = 0
+    value = scope:nym_destination.nym_live_population
+    subtract = var:nym_destination_before
 }
 '''
     write('common/script_values/nanyang_values.txt', values)
     write('common/journal_entries/nanyang_journal.txt', '''
 je_nanyang_migration = {
     group = je_group_foreign_affairs
-    should_be_pinned_by_default_involved = yes
+    context = country
+    should_be_pinned_by_default_uninvolved_or_context = yes
     transferable = no
     can_revolution_inherit = yes
     is_shown_when_inactive = { nym_eligible = yes }
     possible = { nym_eligible = yes }
-    complete = { always = no }
-    fail = { always = no }
+    # Permanent: no outcome blocks and no timeout.
     scripted_button = nym_organize
 }
 ''')
@@ -133,25 +142,34 @@ nym_organize = {
     possible = {
         nym_eligible = yes
         custom_tooltip = {
+            text = nym_pending_tt
+            NOT = { has_global_variable = nym_pending }
+        }
+        custom_tooltip = {
             text = nym_cooldown_tt
             NOT = { has_global_variable = nym_cooldown }
         }
     }
-    ai_chance = { value = 0 }
+    ai_chance = { base = 0 }
     effect = {
         # Timed persistent variable rather than unconditional button cooldown:
         # zero-move attempts must not consume cooldown; successor countries share it.
         if = {
-            limit = { nym_eligible = yes NOT = { has_global_variable = nym_cooldown } }
+            limit = {
+                nym_eligible = yes
+                NOT = { has_global_variable = nym_cooldown }
+                NOT = { has_global_variable = nym_pending }
+            }
             hidden_effect = { nym_execute = yes }
             custom_tooltip = nym_attempt_tt
         }
     }
 }
 ''')
-    effects = '''# Only executed on a player click; no periodic pop scans.
+    effects = '''# One button execution, held under a save-wide lock through verification.
 nym_execute = {
     save_scope_as = nym_country
+    set_global_variable = { name = nym_pending value = yes }
     if = {
         limit = { NOT = { has_global_variable = nym_uses } }
         set_global_variable = { name = nym_uses value = 0 }
@@ -162,8 +180,11 @@ nym_execute = {
     set_variable = { name = nym_source_people value = 0 }
     set_variable = { name = nym_transfer_calls value = 0 }
     set_variable = { name = nym_transfer_requested value = 0 }
-    # Snapshot the source objects and their pre-migration balance. Newly created
-    # arrival objects are never added. Existing arrival objects cannot expand balances.
+    set_variable = { name = nym_stop value = no }
+    set_variable = { name = nym_last_request value = 0 }
+    set_variable = { name = nym_source_delta value = 0 }
+    set_variable = { name = nym_destination_delta value = 0 }
+    # Only POPs present at click time can donate. A later merge cannot raise their budget.
     every_scope_pop = {
         limit = { nym_culture = yes total_size >= 1 }
         set_variable = { name = nym_available value = total_size }
@@ -174,85 +195,124 @@ nym_execute = {
             change_variable = { name = nym_source_count add = 1 }
             change_variable = { name = nym_source_people add = scope:nym_source_size }
         }
-    }
 '''
-    for r in REGIONS:
-        effects += f'''    set_variable = {{ name = nym_count_{r} value = 0 }}
-    every_state = {{
-        limit = {{ nym_region_{r} = yes }}
-        add_to_list = nym_dest_{r}
-        scope:nym_country = {{ change_variable = {{ name = nym_count_{r} add = 1 }} }}
+    for c in CULTURES:
+        effects += f'        if = {{ limit = {{ culture = cu:{c} }} add_to_list = nym_sources_{c} }}\n'
+    effects += '    }\n'
+    for region, states in REGIONS.items():
+        effects += f'    set_variable = {{ name = nym_count_{region} value = 0 }}\n'
+        for state in states:
+            effects += f'''    s:STATE_{state} ?= {{
+        every_scope_state = {{
+            limit = {{ exists = owner }}
+            add_to_list = nym_dest_{region}
+            scope:nym_country = {{ change_variable = {{ name = nym_count_{region} add = 1 }} }}
+        }}
     }}
 '''
-    for r, c, _ in CELLS:
-        effects += f'    nym_run_cell = {{ REGION = {r} CULTURE = {c} AMOUNT = nym_plan_{r}_{c} }}\n'
+    for region, culture, _ in CELLS:
+        effects += f'''    set_global_variable = {{ name = nym_actual_{region}_{culture} value = 0 }}
+    if = {{
+        limit = {{ var:nym_stop = no var:nym_count_{region} > 0 }}
+        nym_run_cell = {{
+            AMOUNT = nym_plan_{region}_{culture}
+            COUNT = var:nym_count_{region}
+            DESTINATIONS = nym_dest_{region}
+            CULTURE = cu:{culture}
+            SOURCES = nym_sources_{culture}
+            CELL_RECORD = nym_actual_{region}_{culture}
+        }}
+    }}
+'''
     effects += '''    every_in_list = {
         list = nym_sources
+        limit = { exists = this }
         remove_variable = nym_available
         remove_variable = nym_origin
     }
     if = {
+        limit = { var:nym_stop = yes }
+        # No safe automatic retry/attribution after an unverified native mutation.
+        trigger_event = { id = nanyang_migration.3 }
+    }
+    else_if = {
         limit = { var:nym_actual > 0 }
         set_global_variable = { name = nym_last value = var:nym_actual }
         set_global_variable = { name = nym_last_target value = var:nym_requested }
         change_global_variable = { name = nym_uses add = 1 }
         set_global_variable = { name = nym_cooldown value = yes years = 5 }
+        remove_global_variable = nym_pending
         trigger_event = { id = nanyang_migration.1 }
     }
-    else = { trigger_event = { id = nanyang_migration.2 } }
+    else = {
+        remove_global_variable = nym_pending
+        trigger_event = { id = nanyang_migration.2 }
+    }
 }
 
-# Country scope. Each nonzero matrix cell has its own unalterable budget.
-# Missing regions are skipped; shortages never spill into another cell/culture.
+# Country scope. Full-token parameters carry the exact references from the caller.
 nym_run_cell = {
+    set_variable = { name = nym_current_culture value = $CULTURE$ }
     set_variable = { name = nym_cell_unassigned value = $AMOUNT$ }
-    set_variable = { name = nym_states_left value = var:nym_count_$REGION$ }
+    set_variable = { name = nym_states_left value = $COUNT$ }
     set_variable = { name = nym_cell_actual value = 0 }
     every_in_list = {
-        list = nym_dest_$REGION$
+        list = $DESTINATIONS$
+        limit = { exists = owner scope:nym_country.var:nym_stop = no }
         save_scope_as = nym_destination
         scope:nym_country = {
             set_variable = { name = nym_quota value = nym_state_share }
             change_variable = { name = nym_cell_unassigned subtract = var:nym_quota }
             change_variable = { name = nym_states_left subtract = 1 }
             every_in_list = {
-                list = nym_sources
+                list = $SOURCES$
                 limit = {
-                    culture = cu:$CULTURE$
+                    scope:nym_country.var:nym_stop = no
+                    scope:nym_country.var:nym_quota >= 1
+                    exists = this
                     has_variable = nym_available
                     var:nym_available >= 1
                     total_size >= 1
                     state = var:nym_origin
-                    state.owner = scope:nym_country
+                    owner = scope:nym_country
                     NOT = { state = scope:nym_destination }
-                    scope:nym_country.var:nym_quota >= 1
                 }
                 nym_transfer = yes
             }
         }
     }
-    # Per-cell actuals persist in the save for audit/debugging.
-    set_global_variable = { name = nym_actual_$REGION$_$CULTURE$ value = var:nym_cell_actual }
+    set_global_variable = { name = $CELL_RECORD$ value = var:nym_cell_actual }
 }
 
-# Pop scope. Debit before moving: native movement may delete or merge this pop.
-# Record destination population delta, never the requested amount, as actual.
+# Pop scope on entry. After the native effect use only the saved country and states.
 nym_transfer = {
     save_scope_value_as = { name = nym_amount value = nym_take }
     if = {
         limit = { scope:nym_amount >= 1 }
+        state = { save_scope_as = nym_origin_state }
         change_variable = { name = nym_available subtract = scope:nym_amount }
         scope:nym_country = {
-            set_variable = { name = nym_before value = scope:nym_destination.state_population }
+            set_variable = { name = nym_source_before value = scope:nym_origin_state.nym_live_population }
+            set_variable = { name = nym_destination_before value = scope:nym_destination.nym_live_population }
+            set_variable = { name = nym_last_request value = scope:nym_amount }
             change_variable = { name = nym_transfer_calls add = 1 }
             change_variable = { name = nym_transfer_requested add = scope:nym_amount }
         }
         move_partial_pop = { state = scope:nym_destination population = scope:nym_amount }
         scope:nym_country = {
-            set_variable = { name = nym_delta value = nym_destination_delta }
-            change_variable = { name = nym_actual add = var:nym_delta }
-            change_variable = { name = nym_cell_actual add = var:nym_delta }
-            change_variable = { name = nym_quota subtract = var:nym_delta }
+            set_variable = { name = nym_source_delta value = nym_source_delta }
+            set_variable = { name = nym_destination_delta value = nym_destination_delta }
+            if = {
+                limit = {
+                    var:nym_source_delta > 0
+                    var:nym_source_delta = var:nym_destination_delta
+                    var:nym_destination_delta <= var:nym_last_request
+                }
+                change_variable = { name = nym_actual add = var:nym_destination_delta }
+                change_variable = { name = nym_cell_actual add = var:nym_destination_delta }
+                change_variable = { name = nym_quota subtract = var:nym_destination_delta }
+            }
+            else = { set_variable = { name = nym_stop value = yes } }
         }
     }
 }
@@ -271,6 +331,13 @@ nanyang_migration.2 = {
     type = country_event
     title = nym_failure_title
     desc = nym_failure_desc
+    is_popup = yes
+    option = { name = nym_ack }
+}
+nanyang_migration.3 = {
+    type = country_event
+    title = nym_pending_title
+    desc = nym_pending_desc
     is_popup = yes
     option = { name = nym_ack }
 }
@@ -305,22 +372,35 @@ nanyang_migration.2 = {
     for lang, data in [('simp_chinese', zh), ('english', en)]:
         val = lambda name: "[GetPlayer.MakeScope.Var('" + name + "').GetValue|0]"
         if lang == 'simp_chinese':
-            diagnostic = ('\\n\\n1.0.2 诊断：来源POP数 ' + val('nym_source_count') + '；来源总人口 ' + val('nym_source_people')
+            diagnostic = ('\\n\\n1.1.0 RC1 诊断：来源POP数 ' + val('nym_source_count') + '；来源总人口 ' + val('nym_source_people')
                 + '。\\n目的州数（马来亚/东印度/暹罗/印度支那/菲律宾/缅甸）：'
                 + '/'.join(val('nym_count_'+r) for r in REGIONS)
                 + '。\\n转移调用次数 ' + val('nym_transfer_calls') + '；请求人口合计 ' + val('nym_transfer_requested')
-                + '；记录迁入合计 ' + val('nym_actual') + '。\\n若调用大于零但记录为零，不能认定没有移动人口，请保留截图与本次error.log，勿反复点击。')
-            data['nym_failure_title'] = '下南洋 1.0.2：迁移记录为零'
-            data['nym_failure_desc'] = '此次未增加成功次数或消耗冷却。此提示不能认定全国人口不足；下方是本次各阶段记录。'
+                + '；记录迁入合计 ' + val('nym_actual') + '。\\n若进入待确认，请保留截图与本次 error.log。')
+            data['nym_failure_title'] = '下南洋：本次未发出转移请求'
+            data['nym_failure_desc'] = '没有找到可执行的来源与目的州配对。本次没有调用人口移动效果，可以在条件变化后重试。'
         else:
-            diagnostic = ('\\n\\n1.0.2 diagnostics: source POPs ' + val('nym_source_count') + '; source persons ' + val('nym_source_people')
+            diagnostic = ('\\n\\n1.1.0 RC1 diagnostics: source POPs ' + val('nym_source_count') + '; source persons ' + val('nym_source_people')
                 + '.\\nDestination states (Malaya/East Indies/Siam/Indochina/Philippines/Burma): '
                 + '/'.join(val('nym_count_'+r) for r in REGIONS)
                 + '.\\nMove calls ' + val('nym_transfer_calls') + '; requested persons ' + val('nym_transfer_requested')
                 + '; recorded arrivals ' + val('nym_actual')
-                + '.\\nIf calls are positive but arrivals are zero, population may have moved. Retain this report and error.log; do not repeatedly click.')
-            data['nym_failure_title'] = 'Nanyang 1.0.2: Zero Recorded Arrivals'
-            data['nym_failure_desc'] = 'No successful use or cooldown was consumed. This report does not establish a national population shortage.'
+                + '.\\nIf verification is blocked, retain this report and error.log.')
+            data['nym_failure_title'] = 'Nanyang: No Transfer Requested'
+            data['nym_failure_desc'] = 'No source and destination pair could be used. No native move was called. You may try again when conditions change.'
+        if lang == 'simp_chinese':
+            data['nym_pending_tt'] = '上次转移尚未确认。请查看结果和日志，或载入操作前的存档。'
+            data['nym_pending_title'] = '下南洋：迁移待确认'
+            data['nym_pending_desc'] = '本次移动后的来源与目的 POP 读数未能确认同一笔转移。已停止后续移动并锁定重试。'
+            diagnostic += ('\\n末笔请求 ' + val('nym_last_request') + '；来源减少 ' + val('nym_source_delta')
+                           + '；目的增加 ' + val('nym_destination_delta') + '。')
+        else:
+            data['nym_pending_tt'] = 'The previous transfer is unconfirmed. Check the report and logs or load a save from before the attempt.'
+            data['nym_pending_title'] = 'Nanyang: Transfer Unconfirmed'
+            data['nym_pending_desc'] = 'The source and destination POP readings did not confirm the same transfer. Further moves and retries are locked.'
+            diagnostic += ('\\nLast request ' + val('nym_last_request') + '; source decrease ' + val('nym_source_delta')
+                           + '; destination increase ' + val('nym_destination_delta') + '.')
+        data['nym_pending_desc'] += diagnostic
         data['nym_failure_desc'] += diagnostic
         data['nym_success_desc'] += diagnostic
         write(f'localization/{lang}/nanyang_l_{lang}.yml', f'l_{lang}:\n' + '\n'.join(f' {k}:0 "{v}"' for k, v in data.items()), bom=True)
