@@ -4,8 +4,8 @@ import json
 
 ROOT = Path(__file__).resolve().parents[1]
 MOD = ROOT / 'nanyang_migration'
-VERSION = '1.1.0-rc.2'
-VERSION_LABEL = '1.1.0 RC2'
+VERSION = '1.1.0-rc.4'
+VERSION_LABEL = '1.1.0 RC4'
 GAME_VERSION = '1.15.2'
 CULTURES = ['min', 'yue', 'hakka', 'han']
 MATRIX = {
@@ -72,6 +72,15 @@ nym_culture = {
     OR = { culture = cu:min culture = cu:yue culture = cu:hakka culture = cu:han }
 }
 '''
+    for name, condition in (
+        ('nym_culture_matches', lambda culture: f'culture = cu:{culture}'),
+        ('nym_culture_has_receipt', lambda culture: f'has_variable = nym_received_{culture}'),
+    ):
+        triggers += f'\n{name} = {{\n    OR = {{\n'
+        for index, culture in enumerate(CULTURES, 1):
+            triggers += (f'        AND = {{ {condition(culture)} '
+                         f'scope:nym_country = {{ var:nym_culture_index = {index} }} }}\n')
+        triggers += '    }\n}\n'
     write('common/scripted_triggers/nanyang_triggers.txt', triggers)
     values = '''# The design budgets use persons. Native move units require the engine probe.
 nym_uses = {
@@ -92,10 +101,9 @@ nym_last_target = {
     for i, (r, c, _) in enumerate(CELLS):
         values += table_value(f'nym_plan_{r}_{c}', [apportion(t)[i] for t in TARGETS])
     values += '''
-# Pop scope: cap against the click-time balance, live population and destination quota.
+# POP scope: read its live size and cap it against the country's destination quota.
 nym_take = {
     value = total_size
-    max = var:nym_available
     max = scope:nym_country.var:nym_quota
     floor = yes
 }
@@ -108,7 +116,7 @@ nym_state_share = {
 nym_live_population = {
     value = 0
     every_scope_pop = {
-        limit = { culture = scope:nym_current_culture }
+        limit = { nym_culture_matches = yes }
         add = total_size
     }
 }
@@ -184,17 +192,17 @@ nym_execute = {
     set_variable = { name = nym_cells_started value = 0 }
     set_variable = { name = nym_positive_shares value = 0 }
     set_variable = { name = nym_source_matches value = 0 }
+    set_variable = { name = nym_culture_candidates value = 0 }
+    set_variable = { name = nym_culture_index value = 0 }
+    # A prior spent/aborted attempt must not leave receipt marks in owned states.
+    every_scope_state = { nym_clear_receipts = yes }
     set_variable = { name = nym_last_request value = 0 }
     set_variable = { name = nym_source_delta value = 0 }
     set_variable = { name = nym_destination_delta value = 0 }
 
-    # Only POPs present at click time can donate. The origin check also
-    # protects against a split inheriting the variables of the old POP.
+    # Initial census for the report. The game rejects variables on POP scope.
     every_scope_pop = {
         limit = { nym_culture = yes total_size >= 1 }
-        set_variable = { name = nym_available value = total_size days = 1 }
-        state = { save_scope_as = nym_snapshot_state }
-        set_variable = { name = nym_origin value = scope:nym_snapshot_state days = 1 }
         save_scope_value_as = { name = nym_source_size value = total_size }
         scope:nym_country = {
             change_variable = { name = nym_source_count add = 1 }
@@ -220,7 +228,7 @@ nym_execute = {
             nym_plan_{region}_{culture} >= 1
         }}
         change_variable = {{ name = nym_cells_started add = 1 }}
-        cu:{culture} = {{ save_scope_as = nym_current_culture }}
+        set_variable = {{ name = nym_culture_index value = {CULTURES.index(culture) + 1} }}
         set_variable = {{ name = nym_cell_unassigned value = nym_plan_{region}_{culture} }}
         set_variable = {{ name = nym_states_left value = var:nym_count_{region} }}
         set_variable = {{ name = nym_cell_actual value = 0 }}
@@ -228,16 +236,19 @@ nym_execute = {
         set_global_variable = {{ name = {record} value = var:nym_cell_actual }}
     }}
 '''
-    effects += '''    every_scope_pop = {
-        limit = { has_variable = nym_available }
-        remove_variable = nym_available
-        remove_variable = nym_origin
-    }
+    effects += '''    every_scope_state = { nym_clear_receipts = yes }
     if = {
         limit = { has_variable = nym_transfer_halted }
-        # Retain the save-wide operation lock, even if the native effect was a no-op.
         remove_variable = nym_transfer_halted
-        trigger_event = { id = nanyang_migration.3 }
+        if = {
+            limit = { var:nym_transfer_calls >= 1 }
+            # Keep the lock after an unconfirmed native call, even if it was a no-op.
+            trigger_event = { id = nanyang_migration.3 }
+        }
+        else = {
+            remove_global_variable = nym_pending
+            trigger_event = { id = nanyang_migration.2 }
+        }
     }
     else_if = {
         limit = { var:nym_actual > 0 }
@@ -275,25 +286,38 @@ nym_visit_destination = {
             if = {
                 limit = { var:nym_quota >= 1 }
                 change_variable = { name = nym_positive_shares add = 1 }
-                every_scope_pop = {
+                nym_find_sources = yes
+            }
+        }
+    }
+}
+
+# Country scope. Scope ownership comes from the country's actual State iterator.
+nym_find_sources = {
+    every_scope_state = {
+        limit = { NOT = { this = scope:nym_destination } }
+        if = {
+            limit = {
+                scope:nym_country = {
+                    NOT = { has_variable = nym_transfer_halted }
+                    var:nym_quota >= 1
+                }
+            }
+            save_scope_as = nym_origin_state
+            every_scope_pop = {
+                limit = { nym_culture_matches = yes total_size >= 1 }
+                if = {
                     limit = {
-                        culture = scope:nym_current_culture
-                        has_variable = nym_available
-                    }
-                    # Recheck mutable guards in the body after each native move.
-                    if = {
-                        limit = {
-                            scope:nym_country = {
-                                NOT = { has_variable = nym_transfer_halted }
-                                var:nym_quota >= 1
-                            }
-                            var:nym_available >= 1
-                            total_size >= 1
-                            state = var:nym_origin
-                            owner = scope:nym_country
-                            NOT = { state = scope:nym_destination }
+                        scope:nym_country = {
+                            NOT = { has_variable = nym_transfer_halted }
+                            var:nym_quota >= 1
                         }
-                        scope:nym_country = { change_variable = { name = nym_source_matches add = 1 } }
+                    }
+                    scope:nym_country = { change_variable = { name = nym_culture_candidates add = 1 } }
+                    # After arrivals, the state cannot distinguish old and newly
+                    # merged POPs. Stop using it as a donor for this culture.
+                    if = {
+                        limit = { scope:nym_origin_state = { nym_culture_has_receipt = no } }
                         nym_transfer = yes
                     }
                 }
@@ -304,34 +328,43 @@ nym_visit_destination = {
 
 # POP scope on entry. After the native effect use only the saved country and states.
 nym_transfer = {
+    scope:nym_country = { change_variable = { name = nym_source_matches add = 1 } }
     save_scope_value_as = { name = nym_amount value = nym_take }
     if = {
         limit = { scope:nym_amount >= 1 }
-        state = { save_scope_as = nym_origin_state }
-        change_variable = { name = nym_available subtract = scope:nym_amount }
-        scope:nym_country = {
-            set_variable = { name = nym_source_before value = scope:nym_origin_state.nym_live_population }
-            set_variable = { name = nym_destination_before value = scope:nym_destination.nym_live_population }
-            set_variable = { name = nym_last_request value = scope:nym_amount }
-            change_variable = { name = nym_transfer_calls add = 1 }
-            change_variable = { name = nym_transfer_requested add = scope:nym_amount }
+        # Mark and verify the actual destination before any native mutation.
+        scope:nym_destination = { nym_mark_receipt = yes }
+        if = {
+            limit = { scope:nym_destination = { nym_culture_has_receipt = yes } }
+            nym_move_and_verify = yes
         }
-        move_partial_pop = { state = scope:nym_destination population = scope:nym_amount }
-        scope:nym_country = {
-            set_variable = { name = nym_source_delta value = nym_source_delta }
-            set_variable = { name = nym_destination_delta value = nym_destination_delta }
-            if = {
-                limit = {
-                    var:nym_source_delta > 0
-                    var:nym_source_delta = var:nym_destination_delta
-                    var:nym_destination_delta <= var:nym_last_request
-                }
-                change_variable = { name = nym_actual add = var:nym_destination_delta }
-                change_variable = { name = nym_cell_actual add = var:nym_destination_delta }
-                change_variable = { name = nym_quota subtract = var:nym_destination_delta }
+        else = { scope:nym_country = { set_variable = nym_transfer_halted } }
+    }
+}
+
+nym_move_and_verify = {
+    scope:nym_country = {
+        set_variable = { name = nym_source_before value = scope:nym_origin_state.nym_live_population }
+        set_variable = { name = nym_destination_before value = scope:nym_destination.nym_live_population }
+        set_variable = { name = nym_last_request value = scope:nym_amount }
+        change_variable = { name = nym_transfer_calls add = 1 }
+        change_variable = { name = nym_transfer_requested add = scope:nym_amount }
+    }
+    move_partial_pop = { state = scope:nym_destination population = scope:nym_amount }
+    scope:nym_country = {
+        set_variable = { name = nym_source_delta value = nym_source_delta }
+        set_variable = { name = nym_destination_delta value = nym_destination_delta }
+        if = {
+            limit = {
+                var:nym_source_delta > 0
+                var:nym_source_delta = var:nym_destination_delta
+                var:nym_destination_delta <= var:nym_last_request
             }
-            else = { set_variable = nym_transfer_halted }
+            change_variable = { name = nym_actual add = var:nym_destination_delta }
+            change_variable = { name = nym_cell_actual add = var:nym_destination_delta }
+            change_variable = { name = nym_quota subtract = var:nym_destination_delta }
         }
+        else = { set_variable = nym_transfer_halted }
     }
 }
 '''
@@ -348,6 +381,21 @@ nym_transfer = {
     }}
 '''
         effects += '}\n'
+    effects += '\nnym_mark_receipt = {\n'
+    for index, culture in enumerate(CULTURES, 1):
+        effects += f'''    if = {{
+        limit = {{ scope:nym_country = {{ var:nym_culture_index = {index} }} }}
+        set_variable = {{ name = nym_received_{culture} value = yes days = 1 }}
+    }}
+'''
+    effects += '}\n\nnym_clear_receipts = {\n'
+    for culture in CULTURES:
+        effects += f'''    if = {{
+        limit = {{ has_variable = nym_received_{culture} }}
+        remove_variable = nym_received_{culture}
+    }}
+'''
+    effects += '}\n'
     write('common/scripted_effects/nanyang_effects.txt', effects)
     write('events/nanyang_events.txt', '''
 namespace = nanyang_migration
@@ -407,6 +455,7 @@ nanyang_migration.3 = {
                 + '。\\n目的州数（马来亚/东印度/暹罗/印度支那/菲律宾/缅甸）：'
                 + '/'.join(val('nym_count_'+r) for r in REGIONS)
                 + '。\\n启动配额 ' + val('nym_cells_started') + '；正额度州份数 ' + val('nym_positive_shares')
+                + '；同文化候选 ' + val('nym_culture_candidates')
                 + '；通过筛选的来源与目的配对 ' + val('nym_source_matches')
                 + '。\\n转移调用次数 ' + val('nym_transfer_calls') + '；请求人口合计 ' + val('nym_transfer_requested')
                 + '；记录迁入合计 ' + val('nym_actual') + '。\\n若进入待确认，请保留截图与本次 error.log。')
@@ -417,6 +466,7 @@ nanyang_migration.3 = {
                 + '.\\nDestination states (Malaya/East Indies/Siam/Indochina/Philippines/Burma): '
                 + '/'.join(val('nym_count_'+r) for r in REGIONS)
                 + '.\\nAllocation cells started ' + val('nym_cells_started') + '; positive state shares ' + val('nym_positive_shares')
+                + '; same-culture candidates ' + val('nym_culture_candidates')
                 + '; eligible source-to-destination pairs ' + val('nym_source_matches')
                 + '.\\nMove calls ' + val('nym_transfer_calls') + '; requested persons ' + val('nym_transfer_requested')
                 + '; recorded arrivals ' + val('nym_actual')

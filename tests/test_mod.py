@@ -30,7 +30,7 @@ def world(uses=0, available=10_000_000, split=1, religion='confucian', move=imme
 class Files(unittest.TestCase):
     def test_metadata(self):
         d = json.loads((MOD/'.metadata/metadata.json').read_text())
-        self.assertEqual(d['version'], '1.1.0-rc.2')
+        self.assertEqual(d['version'], '1.1.0-rc.4')
         self.assertEqual(d['supported_game_version'], '1.15.2')
 
     def test_all_scripts_parse_and_no_empty_files(self):
@@ -158,7 +158,7 @@ class Mathematics(unittest.TestCase):
                 self.assertLess(abs(amount-target*weight/100), 1)
 
 class Execution(unittest.TestCase):
-    def test_screen_report_shape_reaches_native_move(self):
+    def test_screen_report_shape_reaches_native_move_without_pop_variables(self):
         # Recreate the reported totals with synthetic POPs in all four cultures.
         # The screenshot did not expose the real culture or state breakdown.
         h = world()
@@ -171,7 +171,6 @@ class Execution(unittest.TestCase):
             for destination, count in zip(destinations, counts)
             for _ in range(count)
         ]
-
         h.click()
 
         values = h.country.vars
@@ -182,9 +181,28 @@ class Execution(unittest.TestCase):
         self.assertEqual(values['nym_positive_shares'], 225)
         # A share can consume the remainder of one donor and continue with another.
         self.assertGreaterEqual(values['nym_transfer_calls'], values['nym_positive_shares'])
+        self.assertEqual(values['nym_culture_candidates'], values['nym_source_matches'])
         self.assertEqual(values['nym_source_matches'], values['nym_transfer_calls'])
         self.assertEqual(values['nym_transfer_requested'], 2_000_000)
         self.assertEqual(h.globals['nym_last'], 2_000_000)
+
+    def test_domestic_arrivals_cannot_be_reexported(self):
+        h = world(available=100)
+        for state in h.states:
+            state.owner = h.country
+        h.click()
+        self.assertEqual(h.moved, 400)
+        self.assertTrue(all(origin is h.states[0] for origin, *_ in h.transfers))
+        self.assertGreater(h.country.vars['nym_culture_candidates'], h.country.vars['nym_source_matches'])
+
+    def test_failed_state_receipt_write_never_calls_move(self):
+        h = world()
+        h.ignore_state_writes = True
+        h.click()
+        self.assertEqual(h.country.vars['nym_source_matches'], 1)
+        self.assertEqual(h.country.vars['nym_transfer_calls'], 0)
+        self.assertEqual(h.events, ['nanyang_migration.2'])
+        self.assertNotIn('nym_pending', h.globals)
 
     def test_no_op_stops_remaining_pops_in_same_state_pass(self):
         h = world(move=lambda *_: None)
@@ -388,21 +406,23 @@ class Execution(unittest.TestCase):
         self.assertTrue(all(a is not b for a,b,_,_ in h.transfers))
         self.assertTrue(all(p.size >= 0 for p in h.pops))
 
-    def test_split_cannot_reexport_copied_origin_marker(self):
-        def copy_split_variables(h, pop, destination, amount):
-            before = len(h.pops)
-            h.apply_move(pop, destination, amount)
-            if len(h.pops) > before:
-                h.pops[-1].vars.update(pop.vars)
-                h.pops[-1].vars['nym_available'] = amount
-
-        h = world(available=100, move=copy_split_variables)
-        for state in h.states:
-            state.owner = h.country
+    def test_receipt_blocks_only_the_arriving_culture_and_is_cleared(self):
+        h = world()
+        source, malaya, east_indies = h.states[:3]
+        malaya.owner = h.country
+        h.pops = [Pop(source, 'min', 100), Pop(malaya, 'min', 30), Pop(malaya, 'yue', 50)]
         h.click()
-        self.assertEqual(h.moved, 400)
-        self.assertTrue(all(origin is h.states[0] for origin, *_ in h.transfers))
-        self.assertTrue(all('nym_available' not in pop.vars for pop in h.pops if pop.size > 0))
+        self.assertEqual(h.transfers, [
+            (source, malaya, 'min', 100),
+            (malaya, east_indies, 'yue', 50),
+        ])
+        self.assertEqual(h.population(malaya), 130)
+        self.assertNotIn('nym_received_min', malaya.vars)
+
+    def test_harness_rejects_the_rc2_has_variable_trigger_on_pop(self):
+        h = world()
+        with self.assertRaisesRegex(ValueError, "This scope doesn't support variables: POP"):
+            h.condition(parse('has_variable = nym_available'), h.pops[0])
 
     def test_failure_preserves_last_success(self):
         h = world()

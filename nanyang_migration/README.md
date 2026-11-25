@@ -1,4 +1,4 @@
-# 下南洋 · Nanyang Migration 1.1.0 RC2
+# 下南洋 · Nanyang Migration 1.1.0 RC4
 
 目标版本：**Victoria 3 1.15.2**。原生 Paradox Script，运行时无外部依赖。
 这是已生成并通过静态/模拟执行检查的安装候选包；本环境没有游戏，
@@ -65,21 +65,18 @@
 ## 来源、真实迁移及异常
 
 所有拥有的州都能供给人口，包括非传统聚居州、未整合州、海外州；没有中国省份白名单。
-来源为点击时的四文化 POP 快照，每个对象的可抽取额度不超过其初始总人口。
-迁入后新产生的 POP 不加入来源快照；合并进既有来源 POP 的迁入者不会扩大该对象额度。
-整个对象被搬离后，其来源州不再匹配，不能再次作为原来源使用。
-本机制在原生 POP 对象可用的粒度上追踪额度，不能追踪合并后每个个人的身份。
+开航时统计四种文化的来源规模。每笔使用来源州当前可用的实际 POP。一个州收到本次迁入的
+某种文化后，当次暂停从该州迁出该文化，避免把刚抵达的人再次移走。这个保护也会保留该州
+尚未迁出的原有人口，可能减少国内路线的完成量。其他文化仍可迁出，下次起航可重新选择。
 
 仅调用原生 `move_partial_pop = { state = … population = … }`，
 不会创建 POP、杀死人口、添加增长修正、改变文化或宗教。
 从 `total_size` 读取来源额度，不将 workforce 误作总人口。
 原生规则会让迁入者失业，或使不能失业/不允许的奴隶职业转为默认职业。
 
-每笔请求限制为当时 POP 大小、点击时剩余来源预算、目的州额度中的最小值。发出请求前
-扣减来源快照预算，避免合并扩充额度。完成后分别重扫两个州该文化的 POP，来源减少量和
-目的增加量必须为相同的正数，且不超过请求量，才计入实际总量。若原生效果少移且两端读数
-一致，按实测值结算。出处不足时，已发出的请求占用来源预算，即使引擎只执行了一部分，
-因此极端拆分情况下可更保守地少移一部分。
+每笔请求受当时 POP 大小和目的州额度限制。接收标记写在目标州，并在调用原生迁移前
+回读确认。完成后分别重扫两个州该文化的 POP。来源减少量和目的增加量须为相同的正数，
+且不超过请求量，才计入实际总量。若原生效果少移且两端读数一致，按实测值结算。
 
 任何一笔无法核对时，中止余下调用，保留全局 `nym_pending`。这需要加载点击前的
 存档才能重新尝试。等待游戏日推进不会自动认定到账或解除锁定，因为正常人口变化
@@ -130,9 +127,9 @@
 
 ## 升级与游戏内验收
 
-1. 完全退出游戏，移除旧 Mod 目录再解压新版，确保播放集中只启用一个正式版本。新版结果弹窗标为 **1.1.0 RC2**。若 RC1 的结果显示转移调用为 0，则该次点击没有发出转移请求。
+1. 完全退出游戏，移除旧 Mod 目录再解压新版，确保播放集中只启用一个正式版本。新版结果弹窗标为 **1.1.0 RC4**。若旧版的结果显示转移调用为 0，则该次点击没有发出转移请求。
 2. 用 1.15.2 新建 1836 大清备份测试档。打开“下南洋”，检查按钮和 200 万计划。先做独立小额诊断可确认原生迁移行为，见仓库的诊断 ZIP。
-3. 在测试档点击一次正式按钮，核对结果、弹窗中的末笔请求及两端人口差额，并比较来源和目的州的文化人口。若调用仍为零，保留本次的启动配额、正额度州份数和通过筛选的配对数。核对累计成功为 1、下次目标为 250 万、五年冷却和保存重载。
+3. 在测试档点击一次正式按钮，核对结果、弹窗中的末笔请求及两端人口差额，并比较来源和目的州的文化人口。若调用仍为零，保留本次弹窗里的同文化候选和配对数，并附上同一次运行的 error.log。核对累计成功为 1、下次目标为 250 万、五年冷却和保存重载。
 4. 若显示“迁移待确认”，保留操作前存档和完整弹窗。一次性提供游戏版本/校验码、Mod 版本、弹窗、同次运行的 `logs/error.log` 和独立诊断报告。必要时提供点击前后的人口界面截图。
 
 旧游戏版本存档升级取决于游戏自身兼容性，本候选版未实测。旧 Mod 的 `nym_uses`、`nym_cooldown`、最近成功记录继续读取，旧暂存数据不参与新操作。1.0.0–1.0.2 的零记录可能对应已发生的移动。优先以旧版第一次点击之前的备份验证。由于没有可靠的旧迁移账目，此版本不能自动恢复旧版人口。
@@ -141,4 +138,4 @@
 
 ## English installation summary
 
-Target: Victoria 3 1.15.2, release candidate 1.1.0 RC2. Extract the complete `nanyang_migration` folder into the game's user-data `mod` directory, keeping `.metadata/metadata.json`. Enable it in a Launcher playset. No DLC or runtime dependencies are required. Use a backed-up new Qing save. If the report says “Transfer Unconfirmed”, reload the pre-attempt save for another test and retain the report and game log. Engine acceptance remains pending.
+Target: Victoria 3 1.15.2, release candidate 1.1.0 RC4. Extract the complete `nanyang_migration` folder into the game's user-data `mod` directory, keeping `.metadata/metadata.json`. Enable it in a Launcher playset. No DLC or runtime dependencies are required. Use a backed-up new Qing save. If the report says “Transfer Unconfirmed”, reload the pre-attempt save for another test and retain the report and game log. Engine acceptance remains pending.

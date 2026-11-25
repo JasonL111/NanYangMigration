@@ -13,3 +13,21 @@ nym_eligible = {
 nym_culture = {
     OR = { culture = cu:min culture = cu:yue culture = cu:hakka culture = cu:han }
 }
+
+nym_culture_matches = {
+    OR = {
+        AND = { culture = cu:min scope:nym_country = { var:nym_culture_index = 1 } }
+        AND = { culture = cu:yue scope:nym_country = { var:nym_culture_index = 2 } }
+        AND = { culture = cu:hakka scope:nym_country = { var:nym_culture_index = 3 } }
+        AND = { culture = cu:han scope:nym_country = { var:nym_culture_index = 4 } }
+    }
+}
+
+nym_culture_has_receipt = {
+    OR = {
+        AND = { has_variable = nym_received_min scope:nym_country = { var:nym_culture_index = 1 } }
+        AND = { has_variable = nym_received_yue scope:nym_country = { var:nym_culture_index = 2 } }
+        AND = { has_variable = nym_received_hakka scope:nym_country = { var:nym_culture_index = 3 } }
+        AND = { has_variable = nym_received_han scope:nym_country = { var:nym_culture_index = 4 } }
+    }
+}
