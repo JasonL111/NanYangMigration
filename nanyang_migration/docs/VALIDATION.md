@@ -1,13 +1,26 @@
-# 验证报告 · 1.1.1
+# 验证报告 · 1.1.3
 
-此版本基于已合并 1.1.0 的 GitHub `main`（`9e99a63`）。安装包检查 ZIP CRC 和内部、外部 SHA-256。
+此版本基于 1.1.2（`9a92eb5`），修正原创港口插图在事件窗口中的横向拉伸。安装包检查 ZIP CRC 和内部、外部 SHA-256。
 
 | 等级 | 结果 |
 | --- | --- |
 | A 原生文档 | 已核对 1.15.2 引擎生成日志中实际调用的 POP、State、Scope、保存变量和事件接口，以及 1.15 新 Journal/按钮类型。游戏数据、官方公告和部分参数语义仍有证据缺口，详见[兼容性调查](COMPATIBILITY_1_15.md)与[接口表](NATIVE_SCRIPT_REFERENCE.md)。 |
-| B 静态 / 构建 | 执行生成、脚本结构/引用、本地化、少额探针结构、旧设计 ID 与矩阵检查。核对三个事件的纹理引用、1280×960 DDS 和 DXT1 文件头。ZIP 重读全量文件，检查 CRC 与内部、外部 SHA-256。 |
+| B 静态 / 构建 | 执行生成、脚本结构/引用、本地化、少额探针结构、旧设计 ID 与矩阵检查。核对三个事件的纹理引用、1280×696 DXT1 DDS 的头部与画框比例。ZIP 重读全量文件，检查 CRC 与内部、外部 SHA-256。 |
 | C 场景模型 | Python 3.12.14（Linux）执行 40 项 B/C 检查，全部通过，无失败或跳过。见 [实际输出](test-results.txt)。 |
-| D 真实引擎 | 玩家确认 RC4 正常迁移。本环境无 Victoria 3，未在引擎中复测新额度、文案、计时或配图显示。 |
+| D 真实引擎 | 玩家确认 RC4 正常迁移，并报告 1.1.2 配图横向拉伸。本环境无 Victoria 3，1.1.3 的实机显示待验收。 |
+
+## 事件图比例
+
+1.15.1 的默认事件窗截图与源纹理配准结果为 **1120×609**，图像会铺满画框。1.15.0 的变更清单列出了 `gui/eventwindow.gui`，1.15.2 的清单未再列出。1.1.2 把原画做成 1280×960（4:3）DDS，在该画框下，横向缩放系数与纵向缩放系数的比值为 `(1120 / 1280) / (609 / 960) ≈ 1.379`。新版 DDS 为 1280×696（160:87），两个方向的缩放系数均为 0.875。画框高度可能随长文案变化，因此这组尺寸对应默认事件画框的实测例。 [1.15.1 截图测量记录](https://github.com/jakeOmega/Vic3TimelineExtended/blob/e4e9cdcc1145cc71308fada40f0f643502499720/scripts/image_pipeline/contact_sheet.py#L42-L52) · [1.15.0 变更清单](https://github.com/Victoria-3-Modding-Co-op/Modding-Digests/blob/0e94618d6a1b1599d4c78cc074282598de4d59b2/1.15.0/changes_files.md#L2892) · [1.15.2 变更清单](https://github.com/Victoria-3-Modding-Co-op/Modding-Digests/blob/0e94618d6a1b1599d4c78cc074282598de4d59b2/1.15.2/changes_files.md)
+
+从仓库源码 PNG 等比缩放并居中裁去上下边缘。复做纹理时，从仓库根目录运行以下命令。
+
+```sh
+magick assets/nanyang_harbor.png -colorspace sRGB -resize '1280x696^' \
+  -gravity center -extent 1280x696 -alpha off \
+  -define dds:compression=dxt1 -define dds:mipmaps=0 \
+  nanyang_migration/gfx/event_pictures/nanyang_harbor.dds
+```
 
 `tools/script_harness.py` 解释本项目的脚本子集。脚本参数只接受完整 token，作用域按测试对象建模。数值运算使用有理数与明确 floor，不模拟原生定点精度。迁移由测试用例显式注入，默认未知效果会报错。立即完成场景主动模拟合并和源对象耗尽；也覆盖延迟移动、州缓存不变、无动作、仅一端变化、部分移动、超过请求量、在国家切换后仍然锁定。时间到期和重载是模型行为，未模拟游戏存档序列化、Jomini 内存引用、异步 POP 变化或原生时间。
 

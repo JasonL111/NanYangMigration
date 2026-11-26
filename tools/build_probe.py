@@ -1,9 +1,10 @@
 """Generate a separate, once-per-save, small-move native diagnostic."""
 import json
 
-from build_mod import ROOT, GAME_VERSION, VERSION
+from build_mod import ROOT, GAME_VERSION
 
 PROBE = ROOT / 'diagnostics/nanyang_native_probe'
+PROBE_VERSION = '1.1.1'
 MODES = {
     'literal': 'population = 100',
     'dynamic': 'population = scope:nyp_amount',
@@ -19,7 +20,7 @@ def write(path, contents, bom=False):
 
 def main():
     write('.metadata/metadata.json', json.dumps({
-        'name': 'Nanyang Native POP Probe', 'id': 'nanyang_native_probe', 'version': VERSION,
+        'name': 'Nanyang Native POP Probe', 'id': 'nanyang_native_probe', 'version': PROBE_VERSION,
         'supported_game_version': GAME_VERSION, 'relationships': [],
         'short_description': 'Single small POP experiment for a disposable 1836 save.',
         'tags': ['Gameplay'], 'game_custom_data': {'multiplayer_synchronized': True},
