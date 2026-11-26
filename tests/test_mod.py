@@ -31,7 +31,7 @@ def world(uses=0, available=10_000_000, split=1, religion='confucian', move=imme
 class Files(unittest.TestCase):
     def test_metadata(self):
         d = json.loads((MOD/'.metadata/metadata.json').read_text())
-        self.assertEqual(d['version'], '1.1.2')
+        self.assertEqual(d['version'], '1.1.3')
         self.assertEqual(d['supported_game_version'], '1.15.2')
 
     def test_all_scripts_parse_and_no_empty_files(self):
@@ -94,8 +94,11 @@ class Files(unittest.TestCase):
         data = (MOD/pictures[0]).read_bytes()
         self.assertEqual(data[:4], b'DDS ')
         self.assertEqual(data[84:88], b'DXT1')
-        self.assertEqual(unpack_from('<II', data, 12), (960, 1280))
-        self.assertEqual(len(data), 128 + 320*240*8)
+        height, width = unpack_from('<II', data, 12)
+        # The 1.15 default event window was measured at 1120 by 609.
+        self.assertEqual(width * 609, height * 1120, 'DDS must match the event frame aspect ratio')
+        self.assertEqual((width % 4, height % 4), (0, 0))
+        self.assertEqual(len(data), 128 + (width // 4) * (height // 4) * 8)
 
     def test_versioned_identifiers(self):
         evidence = json.loads((MOD/'docs/reference_ids.json').read_text())

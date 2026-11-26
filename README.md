@@ -1,13 +1,13 @@
 # 下南洋 / Nanyang Migration
 
-**1.1.2**（Victoria 3 **1.15.2**）。组织闽、粤、客家与汉人赴南洋安家。首航计划
+**1.1.3**（Victoria 3 **1.15.2**）。组织闽、粤、客家与汉人赴南洋安家。首航计划
 **200,000 人**，每次成功后下一航次增加 **25%**，单次最多 **500,000 人**，成功后休整 **3 个游戏年**。
 无需额外 DLC 或运行时依赖。三个航程结果事件均使用原创南洋港口插图。
 
 - [正式安装包](nanyang_migration.zip) · [SHA-256](nanyang_migration.zip.sha256)
 - [安装说明与迁移矩阵](nanyang_migration/README.md) · [版本记录](nanyang_migration/docs/CHANGELOG.md)
 - [1.15 兼容性](nanyang_migration/docs/COMPATIBILITY_1_15.md) · [原生脚本参考](nanyang_migration/docs/NATIVE_SCRIPT_REFERENCE.md) · [验证报告](nanyang_migration/docs/VALIDATION.md)
-- 安装包使用 1280×960 的 DXT1 DDS 纹理。 [港口插图源文件](assets/nanyang_harbor.png)
+- 安装包使用按事件画框比例裁切的 1280×696 DXT1 DDS。 [港口插图源文件](assets/nanyang_harbor.png)
 
 ## 动员侨民 / Overseas Chinese Mobilization
 

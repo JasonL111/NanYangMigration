@@ -1,4 +1,4 @@
-# 下南洋 · Nanyang Migration 1.1.2
+# 下南洋 · Nanyang Migration 1.1.3
 
 目标版本：**Victoria 3 1.15.2**。原生 Paradox Script，运行时无外部依赖。
 首航计划 **200,000 人**，成功后下一航次增加 **25%**，单次最多 **500,000 人**，
@@ -125,7 +125,7 @@
 
 ## 从旧版升级
 
-退出游戏后，用新版目录替换旧安装，并在启动器中确认版本为 **1.1.2**。
+退出游戏后，用新版目录替换旧安装，并在启动器中确认版本为 **1.1.3**。
 存档中的成功次数和历史航次保留。**下一次计划按新额度计算**。若旧版已开始冷却，
 原来的到期时间保留，升级后成功的航次起用三年冷却。
 
@@ -133,7 +133,7 @@
 
 ## English installation summary
 
-Target game is Victoria 3 1.15.2. Extract the `nanyang_migration` folder from the 1.1.2 ZIP into the
+Target game is Victoria 3 1.15.2. Extract the `nanyang_migration` folder from the 1.1.3 ZIP into the
 game's user-data `mod` directory, keeping `.metadata/metadata.json`, then enable it in the Launcher.
 The first expedition plans for 200,000 people. Each success raises the next plan by 25% to a maximum
 of 500,000 and starts a three-year cooldown. Existing saves retain completed expeditions and cooldowns

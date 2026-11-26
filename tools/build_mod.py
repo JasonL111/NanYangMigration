@@ -6,7 +6,7 @@ import json
 ROOT = Path(__file__).resolve().parents[1]
 MOD = ROOT / 'nanyang_migration'
 HARBOR_TEXTURE = 'gfx/event_pictures/nanyang_harbor.dds'
-VERSION = '1.1.2'
+VERSION = '1.1.3'
 GAME_VERSION = '1.15.2'
 INITIAL_TARGET = 200_000
 MAX_TARGET = 500_000
