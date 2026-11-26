@@ -1,0 +1,12 @@
+{
+  "name": "洋务自强 · Self-Strengthening Reform",
+  "id": "self_strengthening_reform",
+  "version": "1.0.0",
+  "supported_game_version": "1.15.2",
+  "short_description": "A player-led Qing reform that shifts the political strength of three interest groups for twenty years.",
+  "tags": ["Gameplay", "Historical"],
+  "relationships": [],
+  "game_custom_data": {
+    "multiplayer_synchronized": true
+  }
+}
