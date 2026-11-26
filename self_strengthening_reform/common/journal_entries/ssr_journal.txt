@@ -1,0 +1,21 @@
+ssr_je_reform = {
+    context = country
+    group = je_group_internal_affairs
+    can_deactivate = yes
+    can_revolution_inherit = yes
+
+    is_shown_when_inactive = {
+        ssr_player_chinese_monarchy = yes
+        NOT = { has_global_variable = ssr_reform_enacted }
+    }
+    possible = { ssr_player_chinese_monarchy = yes }
+    scripted_button = ssr_reform_button
+
+    outcome = {
+        header = ssr_reform_outcome
+        effect_header = ssr_reform_outcome_effect
+        conclusion_desc = ssr_je_reform_concluded_desc
+        color = "gold_positive"
+        trigger = { has_global_variable = ssr_reform_enacted }
+    }
+}

@@ -1,0 +1,45 @@
+namespace = self_strengthening_reform
+
+self_strengthening_reform.1 = {
+    type = country_event
+    title = ssr_petition_title
+    desc = ssr_petition_desc
+    duration = 3
+    event_image = { texture = "gfx/event_pictures/ssr_reform_council.dds" }
+
+    option = {
+        name = ssr_reform_enact
+        trigger = {
+            ssr_owns_petition = yes
+            ssr_can_enact_reform = yes
+        }
+        ai_chance = { base = 0 }
+        if = {
+            limit = { ssr_owns_petition = yes }
+            if = {
+                limit = { ssr_can_enact_reform = yes }
+                add_modifier = { name = ssr_reforms years = 20 }
+                hidden_effect = {
+                    if = {
+                        limit = { has_modifier = ssr_reforms }
+                        set_global_variable = ssr_reform_enacted
+                    }
+                }
+            }
+            hidden_effect = { remove_global_variable = ssr_petition_country }
+        }
+    }
+
+    option = {
+        name = ssr_reform_defer
+        default_option = yes
+        ai_chance = { base = 1 }
+        custom_tooltip = ssr_reform_defer_tt
+        hidden_effect = {
+            if = {
+                limit = { ssr_owns_petition = yes }
+                remove_global_variable = ssr_petition_country
+            }
+        }
+    }
+}

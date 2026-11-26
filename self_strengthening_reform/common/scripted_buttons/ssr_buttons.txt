@@ -1,0 +1,22 @@
+ssr_reform_button = {
+    name = ssr_reform_button_name
+    desc = ssr_reform_button_desc
+    visible = {
+        ssr_player_chinese_monarchy = yes
+        NOT = { has_global_variable = ssr_reform_enacted }
+    }
+    possible = { ssr_can_submit_petition = yes }
+    ai_chance = { base = 0 }
+
+    effect = {
+        custom_tooltip = ssr_open_petition_tt
+        hidden_effect = {
+            if = {
+                limit = { ssr_can_submit_petition = yes }
+                # The petition lasts three months. The lock also expires if the event is discarded.
+                set_global_variable = { name = ssr_petition_country value = this days = 94 }
+                trigger_event = { id = self_strengthening_reform.1 popup = yes }
+            }
+        }
+    }
+}

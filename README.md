@@ -30,3 +30,12 @@ sha256sum -c nanyang_migration.zip.sha256 nanyang_native_probe.zip.sha256
 ```
 
 Windows 可对 ZIP 使用 PowerShell `Get-FileHash -Algorithm SHA256`，与相应 `.sha256` 文件核对。游戏本体文件从未纳入安装包。
+
+## 洋务自强 / Self-Strengthening Reform
+
+**1.0.0 候选版**（Victoria 3 **1.15.2**）。1861 年起，地主 Clout 达到 20% 的中国君主制玩家可批准一次洋务改革，获得为期 20 年的三组政治力量与认同度修正。
+
+- [安装说明与玩法](self_strengthening_reform/README.md) · [原生脚本参考](self_strengthening_reform/docs/NATIVE_SCRIPT_REFERENCE.md) · [验证报告](self_strengthening_reform/docs/VALIDATION.md)
+- [洋务自强安装包](self_strengthening_reform.zip) · [SHA-256](self_strengthening_reform.zip.sha256)
+
+《下南洋》《动员侨民》《洋务自强》均可单独安装，也可以在同一播放集中启用。

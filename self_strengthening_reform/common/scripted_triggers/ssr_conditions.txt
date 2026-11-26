@@ -1,0 +1,57 @@
+ssr_player_chinese_monarchy = {
+    is_player = yes
+    is_country_alive = yes
+    has_law = law_type:law_monarchy
+    OR = {
+        country_definition = cd:CHI
+        AND = {
+            exists = civil_war_origin_country
+            civil_war_origin_country ?= { country_definition = cd:CHI }
+        }
+        AND = {
+            has_global_variable = chinese_central_government
+            global_var:chinese_central_government ?= this
+        }
+    }
+}
+
+ssr_can_enact_reform = {
+    custom_tooltip = {
+        text = ssr_requires_player_monarchy
+        ssr_player_chinese_monarchy = yes
+    }
+    custom_tooltip = {
+        text = ssr_requires_year
+        year >= 1861
+    }
+    custom_tooltip = {
+        text = ssr_requires_landowner_clout
+        exists = ig:ig_landowners
+        ig:ig_landowners ?= { ig_clout >= 0.20 }
+    }
+    custom_tooltip = {
+        text = ssr_requires_unused_reform
+        NOR = {
+            has_global_variable = ssr_reform_enacted
+            has_modifier = ssr_reforms
+        }
+    }
+}
+
+ssr_can_submit_petition = {
+    ssr_can_enact_reform = yes
+    custom_tooltip = {
+        text = ssr_requires_no_open_petition
+        NOT = {
+            AND = {
+                has_global_variable = ssr_petition_country
+                global_var:ssr_petition_country ?= { is_country_alive = yes }
+            }
+        }
+    }
+}
+
+ssr_owns_petition = {
+    has_global_variable = ssr_petition_country
+    global_var:ssr_petition_country ?= this
+}
