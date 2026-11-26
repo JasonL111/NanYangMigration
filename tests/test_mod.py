@@ -31,7 +31,7 @@ def world(uses=0, available=10_000_000, split=1, religion='confucian', move=imme
 class Files(unittest.TestCase):
     def test_metadata(self):
         d = json.loads((MOD/'.metadata/metadata.json').read_text())
-        self.assertEqual(d['version'], '1.1.1')
+        self.assertEqual(d['version'], '1.1.2')
         self.assertEqual(d['supported_game_version'], '1.15.2')
 
     def test_all_scripts_parse_and_no_empty_files(self):
