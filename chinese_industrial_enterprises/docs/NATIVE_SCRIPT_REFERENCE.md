@@ -15,7 +15,7 @@
 
 ## 基础经营的数量
 
-1.15.2 公司类型说明的 `building_types` 按列表读取，文档未标注上限。CWTools 的类型规则基数为 `1..inf`，当前标注 1.15.2 的 Vic3TimelineExtended 中可找到拥有九项基础建筑的定义。目标版原版快照里的实际公司最多列三项。现有证据支持直接声明全部经营建筑，无法据此确认引擎或面板实际显示十项。中华实业保留华兴七项、鲁农六项、丰殖十项和矿业六项，列入实机验收。 [CWTools company_types](https://github.com/cwtools/cwtools-vic3-config/blob/bec10017635de6dac01525210b4c932db0ce1c40/config/common/company_types.cwt) · [1.15.2 社区公司定义](https://github.com/jakeOmega/Vic3TimelineExtended/blob/2710a77703e2e3c982d4b29425bd1e34fb496835/common/company_types/extra_companies_flavored.txt) · [原版公司快照](https://github.com/jakeOmega/Vic3TimelineExtended/blob/2710a77703e2e3c982d4b29425bd1e34fb496835/vanilla_parsed/common/company_types.json)
+1.15.2 公司类型说明的 `building_types` 按列表读取，文档未标注上限。CWTools 的类型规则基数为 `1..inf`，当前标注 1.15.2 的 Vic3TimelineExtended 中可找到拥有九项基础建筑的定义。目标版原版快照里的实际公司最多列三项。现有证据支持直接声明全部经营建筑，无法据此确认引擎或面板实际显示十项。中华实业配置了华兴六项、鲁农六项、丰殖十项和矿业六项，列入实机验收。 [CWTools company_types](https://github.com/cwtools/cwtools-vic3-config/blob/bec10017635de6dac01525210b4c932db0ce1c40/config/common/company_types.cwt) · [1.15.2 社区公司定义](https://github.com/jakeOmega/Vic3TimelineExtended/blob/2710a77703e2e3c982d4b29425bd1e34fb496835/common/company_types/extra_companies_flavored.txt) · [原版公司快照](https://github.com/jakeOmega/Vic3TimelineExtended/blob/2710a77703e2e3c982d4b29425bd1e34fb496835/vanilla_parsed/common/company_types.json)
 
 ## 繁荣、生产与图形
 

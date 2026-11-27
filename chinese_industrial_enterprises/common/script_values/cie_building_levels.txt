@@ -8,7 +8,6 @@ cie_huaxing_levels = {
                 is_building_type = building_tooling_workshop
                 is_building_type = building_steel_mill
                 is_building_type = building_motor_industry
-                is_building_type = building_shipyard
                 is_building_type = building_railway
                 is_building_type = building_power_plant
             }

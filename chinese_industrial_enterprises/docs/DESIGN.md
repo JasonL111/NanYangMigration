@@ -6,7 +6,7 @@
 
 | 公司 | 原生建筑映射 | 原生修正 |
 | --- | --- | --- |
-| 华兴实业 | `building_automotive_industry`、`building_tooling_workshop`、`building_steel_mill`、`building_motor_industry`、`building_shipyard`、`building_railway`、`building_power_plant` | `state_construction_mult = 0.10`、`building_university_throughput_add = 0.10` |
+| 华兴实业 | `building_automotive_industry`、`building_tooling_workshop`、`building_steel_mill`、`building_motor_industry`、`building_railway`、`building_power_plant` | `state_construction_mult = 0.10`、`building_university_throughput_add = 0.10` |
 | 鲁农集团 | `building_wheat_farm`、`building_rice_farm`、`building_rye_farm`、`building_maize_farm`、`building_millet_farm`、`building_banana_plantation` | `state_standard_of_living_add = 1` |
 | 丰殖商号 | `building_tea_plantation`、`building_coffee_plantation`、`building_cotton_plantation`、`building_silk_plantation`、`building_dye_plantation`、`building_sugar_plantation`、`building_tobacco_plantation`、`building_opium_plantation`、`building_rubber_plantation`、`building_vineyard` | 各用对应的 `building_<名称>_throughput_add = 0.20` |
 | 中华矿业总公司 | `building_coal_mine`、`building_iron_mine`、`building_copper_mine`、`building_lead_mine`、`building_sulfur_mine`、`building_gold_mine` | 各用对应的 `building_<名称>_throughput_add = 0.15` |

@@ -89,7 +89,7 @@ class CompanySpec:
 SPECS = {
     "huaxing_industries": CompanySpec(
         "华兴实业", "Huaxing Industries", "steelworking",
-        ("automotive_industry", "tooling_workshop", "steel_mill", "motor_industry", "shipyard", "railway", "power_plant"),
+        ("automotive_industry", "tooling_workshop", "steel_mill", "motor_industry", "railway", "power_plant"),
         30, {"state_construction_mult": Decimal("0.10"), "building_university_throughput_add": Decimal("0.10")},
         "huaxing_precision_machinery", "tools", "huaxing",
     ),

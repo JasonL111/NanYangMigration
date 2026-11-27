@@ -7,7 +7,6 @@ cie_huaxing_industries = {
         building_tooling_workshop
         building_steel_mill
         building_motor_industry
-        building_shipyard
         building_railway
         building_power_plant
     }

@@ -40,7 +40,7 @@ class DesignRuleTests(unittest.TestCase):
     def test_huaxing_combines_levels_across_states(self):
         company = "huaxing_industries"
         owned = [
-            province("STATE_ZHILI", {"tooling_workshop": 14, "university": 100}),
+            province("STATE_ZHILI", {"tooling_workshop": 14, "university": 100, "shipyard": 100}),
             province("STATE_SHANDONG", {"steel_mill": 15}),
         ]
         self.assertFalse(eligible_size(company, owned))
