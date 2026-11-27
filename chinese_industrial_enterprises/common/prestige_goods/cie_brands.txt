@@ -1,0 +1,55 @@
+cie_huaxing_precision_machinery = {
+    possible = { has_dlc_feature = mp1_content }
+    base_good = tools
+    prestige_bonus = 0.1
+    texture = "gfx/interface/icons/company_icons/cie_huaxing.dds"
+}
+
+cie_shandong_premium_grain = {
+    possible = { has_dlc_feature = mp1_content }
+    base_good = grain
+    prestige_bonus = 0.1
+    texture = "gfx/interface/icons/company_icons/cie_shandong.dds"
+}
+
+cie_fengzhi_imperial_tea = {
+    possible = { has_dlc_feature = mp1_content }
+    base_good = tea
+    prestige_bonus = 0.1
+    texture = "gfx/interface/icons/company_icons/cie_fengzhi.dds"
+}
+
+cie_chinese_premium_coal = {
+    possible = { has_dlc_feature = mp1_content }
+    base_good = coal
+    prestige_bonus = 0.1
+    texture = "gfx/interface/icons/company_icons/cie_mining.dds"
+}
+
+cie_chinese_premium_petroleum = {
+    possible = { has_dlc_feature = mp1_content }
+    base_good = oil
+    prestige_bonus = 0.1
+    texture = "gfx/interface/icons/company_icons/cie_petroleum.dds"
+}
+
+cie_huaguang_electric_apparatus = {
+    possible = { has_dlc_feature = mp1_content }
+    base_good = telephones
+    prestige_bonus = 0.1
+    texture = "gfx/interface/icons/company_icons/cie_huaguang.dds"
+}
+
+cie_shenzhou_motorcars = {
+    possible = { has_dlc_feature = mp1_content }
+    base_good = automobiles
+    prestige_bonus = 0.1
+    texture = "gfx/interface/icons/company_icons/cie_shenzhou.dds"
+}
+
+cie_lingyun_aircraft = {
+    possible = { has_dlc_feature = mp1_content }
+    base_good = aeroplanes
+    prestige_bonus = 0.1
+    texture = "gfx/interface/icons/company_icons/cie_lingyun.dds"
+}

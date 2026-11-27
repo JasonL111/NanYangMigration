@@ -1,0 +1,43 @@
+# For a disposable Qing save only. This file is outside the release Mod.
+namespace = cie_qa
+
+cie_qa.1 = {
+    type = country_event
+    hidden = yes
+    fire_only_once = yes
+    immediate = {
+        if = {
+            limit = {
+                country_definition = cd:CHI
+                is_player = yes
+            }
+            add_technology_researched = corporate_charters
+            add_technology_researched = steelworking
+            add_technology_researched = intensive_agriculture
+            add_technology_researched = atmospheric_engine
+            add_technology_researched = pumpjacks
+            add_technology_researched = electrical_generation
+            add_technology_researched = combustion_engine
+            add_technology_researched = military_aviation
+            add_technology_researched = telephone
+
+            capital ?= {
+                create_building = { building = building_tooling_workshop level = 15 }
+                create_building = { building = building_steel_mill level = 15 }
+                create_building = { building = building_automotive_industry level = 20 }
+                create_building = { building = building_motor_industry level = 10 }
+                create_building = { building = building_power_plant level = 15 }
+                create_building = { building = building_electrics_industry level = 10 }
+                create_building = { building = building_university level = 5 }
+            }
+            s:STATE_SHANDONG.region_state:CHI ?= {
+                create_building = { building = building_wheat_farm level = 20 }
+                create_building = { building = building_tea_plantation level = 20 }
+                create_building = { building = building_oil_rig level = 15 }
+            }
+            s:STATE_SHANXI.region_state:CHI ?= {
+                create_building = { building = building_coal_mine level = 20 }
+            }
+        }
+    }
+}
