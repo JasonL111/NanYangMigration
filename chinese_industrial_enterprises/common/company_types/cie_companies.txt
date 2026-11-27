@@ -1,0 +1,217 @@
+cie_huaxing_industries = {
+    icon = "gfx/interface/icons/company_icons/cie_huaxing.dds"
+    background = "gfx/interface/icons/company_icons/company_backgrounds/comp_illu_manufacturing_heavy.dds"
+    flavored_company = yes
+    building_types = {
+        building_automotive_industry
+        building_tooling_workshop
+        building_steel_mill
+        building_motor_industry
+        building_shipyard
+        building_railway
+        building_power_plant
+    }
+    potential = { cie_chinese_country = yes }
+    attainable = { has_technology_researched = steelworking }
+    possible = {
+        custom_tooltip = {
+            text = cie_huaxing_levels_tt
+            cie_huaxing_levels >= 30
+        }
+    }
+    prosperity_modifier = {
+        state_construction_mult = 0.10
+        building_university_throughput_add = 0.10
+    }
+    possible_prestige_goods = { cie_huaxing_precision_machinery }
+    prestige_goods_trigger = { company_is_prosperous = yes }
+    ai_will_do = { always = yes }
+}
+
+cie_shandong_agricultural_group = {
+    icon = "gfx/interface/icons/company_icons/cie_shandong.dds"
+    background = "gfx/interface/icons/company_icons/company_backgrounds/comp_illu_farm_wheat.dds"
+    flavored_company = yes
+    building_types = {
+        building_wheat_farm
+        building_rice_farm
+        building_rye_farm
+        building_maize_farm
+        building_millet_farm
+        building_banana_plantation
+    }
+    potential = { cie_chinese_country = yes }
+    attainable = { has_technology_researched = intensive_agriculture }
+    possible = {
+        custom_tooltip = {
+            text = cie_shandong_levels_tt
+            any_scope_state = {
+                cie_shandong_headquarters = yes
+                cie_shandong_levels >= 20
+            }
+        }
+    }
+    can_establish_in = { cie_shandong_headquarters = yes }
+    prosperity_modifier = {
+        state_standard_of_living_add = 1
+    }
+    possible_prestige_goods = { cie_shandong_premium_grain }
+    prestige_goods_trigger = { company_is_prosperous = yes }
+    ai_will_do = { always = yes }
+}
+
+cie_fengzhi_trading_house = {
+    icon = "gfx/interface/icons/company_icons/cie_fengzhi.dds"
+    background = "gfx/interface/icons/company_icons/company_backgrounds/comp_illu_plantation.dds"
+    flavored_company = yes
+    building_types = {
+        building_tea_plantation
+        building_coffee_plantation
+        building_cotton_plantation
+        building_silk_plantation
+        building_dye_plantation
+        building_sugar_plantation
+        building_tobacco_plantation
+        building_opium_plantation
+        building_rubber_plantation
+        building_vineyard
+    }
+    potential = { cie_chinese_country = yes }
+    attainable = { has_technology_researched = intensive_agriculture }
+    possible = {
+        custom_tooltip = {
+            text = cie_fengzhi_levels_tt
+            cie_fengzhi_levels >= 20
+        }
+    }
+    prosperity_modifier = {
+        building_tea_plantation_throughput_add = 0.20
+        building_coffee_plantation_throughput_add = 0.20
+        building_cotton_plantation_throughput_add = 0.20
+        building_silk_plantation_throughput_add = 0.20
+        building_dye_plantation_throughput_add = 0.20
+        building_sugar_plantation_throughput_add = 0.20
+        building_tobacco_plantation_throughput_add = 0.20
+        building_opium_plantation_throughput_add = 0.20
+        building_rubber_plantation_throughput_add = 0.20
+        building_vineyard_throughput_add = 0.20
+    }
+    possible_prestige_goods = { cie_fengzhi_imperial_tea }
+    prestige_goods_trigger = { company_is_prosperous = yes }
+    ai_will_do = { always = yes }
+}
+
+cie_chinese_mining_corporation = {
+    icon = "gfx/interface/icons/company_icons/cie_mining.dds"
+    background = "gfx/interface/icons/company_icons/company_backgrounds/comp_illu_mining.dds"
+    flavored_company = yes
+    building_types = {
+        building_coal_mine
+        building_iron_mine
+        building_copper_mine
+        building_lead_mine
+        building_sulfur_mine
+        building_gold_mine
+    }
+    potential = { cie_chinese_country = yes }
+    attainable = { has_technology_researched = atmospheric_engine }
+    possible = {
+        custom_tooltip = {
+            text = cie_mining_levels_tt
+            cie_mining_levels >= 20
+        }
+    }
+    prosperity_modifier = {
+        building_coal_mine_throughput_add = 0.15
+        building_iron_mine_throughput_add = 0.15
+        building_copper_mine_throughput_add = 0.15
+        building_lead_mine_throughput_add = 0.15
+        building_sulfur_mine_throughput_add = 0.15
+        building_gold_mine_throughput_add = 0.15
+    }
+    possible_prestige_goods = { cie_chinese_premium_coal }
+    prestige_goods_trigger = { company_is_prosperous = yes }
+    ai_will_do = { always = yes }
+}
+
+cie_chinese_petroleum_company = {
+    icon = "gfx/interface/icons/company_icons/cie_petroleum.dds"
+    background = "gfx/interface/icons/company_icons/company_backgrounds/comp_illu_oil_drills.dds"
+    flavored_company = yes
+    building_types = { building_oil_rig }
+    potential = { cie_chinese_country = yes }
+    attainable = { has_technology_researched = pumpjacks }
+    possible = {
+        country_has_building_type_levels = { target = bt:building_oil_rig value >= 15 }
+    }
+    prosperity_modifier = {
+        building_oil_rig_throughput_add = 0.20
+    }
+    possible_prestige_goods = { cie_chinese_premium_petroleum }
+    prestige_goods_trigger = { company_is_prosperous = yes }
+    ai_will_do = { always = yes }
+}
+
+cie_huaguang_electric_company = {
+    icon = "gfx/interface/icons/company_icons/cie_huaguang.dds"
+    background = "gfx/interface/icons/company_icons/company_backgrounds/comp_illu_manufacturing_heavy.dds"
+    flavored_company = yes
+    building_types = {
+        building_power_plant
+        building_electrics_industry
+    }
+    potential = { cie_chinese_country = yes }
+    attainable = { has_technology_researched = electrical_generation }
+    possible = {
+        country_has_building_type_levels = { target = bt:building_power_plant value >= 15 }
+    }
+    prosperity_modifier = {
+        building_power_plant_throughput_add = 0.15
+    }
+    possible_prestige_goods = { cie_huaguang_electric_apparatus }
+    prestige_goods_trigger = { company_is_prosperous = yes }
+    ai_will_do = { always = yes }
+}
+
+cie_shenzhou_motor_works = {
+    icon = "gfx/interface/icons/company_icons/cie_shenzhou.dds"
+    background = "gfx/interface/icons/company_icons/company_backgrounds/comp_illu_manufacturing_heavy.dds"
+    flavored_company = yes
+    building_types = {
+        building_automotive_industry
+        building_motor_industry
+    }
+    potential = { cie_chinese_country = yes }
+    attainable = { has_technology_researched = combustion_engine }
+    possible = {
+        custom_tooltip = {
+            text = cie_shenzhou_levels_tt
+            cie_shenzhou_levels >= 20
+        }
+    }
+    prosperity_modifier = {
+        building_automotive_industry_throughput_add = 0.20
+        building_motor_industry_throughput_add = 0.20
+    }
+    possible_prestige_goods = { cie_shenzhou_motorcars }
+    prestige_goods_trigger = { company_is_prosperous = yes }
+    ai_will_do = { always = yes }
+}
+
+cie_lingyun_aviation_works = {
+    icon = "gfx/interface/icons/company_icons/cie_lingyun.dds"
+    background = "gfx/interface/icons/company_icons/company_backgrounds/comp_illu_manufacturing_heavy.dds"
+    flavored_company = yes
+    building_types = { building_automotive_industry }
+    potential = { cie_chinese_country = yes }
+    attainable = { has_technology_researched = military_aviation }
+    possible = {
+        country_has_building_type_levels = { target = bt:building_automotive_industry value >= 20 }
+    }
+    prosperity_modifier = {
+        building_automotive_industry_throughput_add = 0.20
+    }
+    possible_prestige_goods = { cie_lingyun_aircraft }
+    prestige_goods_trigger = { company_is_prosperous = yes }
+    ai_will_do = { always = yes }
+}

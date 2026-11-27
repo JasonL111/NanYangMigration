@@ -40,3 +40,10 @@ Windows 可对 ZIP 使用 PowerShell `Get-FileHash -Algorithm SHA256`，与相�
 - [洋务自强安装包](self_strengthening_reform.zip) · [SHA-256](self_strengthening_reform.zip.sha256)
 
 《下南洋》《动员侨民》《洋务自强》均可单独安装，也可以在同一播放集中启用。
+
+## 中华实业 / Chinese Industrial Enterprises
+
+**1.0.0 候选版**（Victoria 3 **1.15.2**）。新增八家架空中国企业，经营范围覆盖农业、矿业、能源和近代工业。公司成立、投资和繁荣奖励沿用游戏原版系统。四个 Mod 都可单独安装。
+
+- [公司一览与安装](chinese_industrial_enterprises/README.md) · [原生脚本参考](chinese_industrial_enterprises/docs/NATIVE_SCRIPT_REFERENCE.md) · [验证报告](chinese_industrial_enterprises/docs/VALIDATION.md)
+- [中华实业安装包](chinese_industrial_enterprises.zip) · [SHA-256](chinese_industrial_enterprises.zip.sha256)

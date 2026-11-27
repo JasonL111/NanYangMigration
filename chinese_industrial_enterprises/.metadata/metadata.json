@@ -1,0 +1,12 @@
+{
+  "name": "中华实业 · Chinese Industrial Enterprises",
+  "id": "chinese_industrial_enterprises",
+  "version": "1.0.0",
+  "supported_game_version": "1.15.2",
+  "short_description": "Eight fictional Chinese companies using Victoria 3's native company and prosperity systems.",
+  "tags": ["Gameplay", "Economy and Buildings"],
+  "relationships": [],
+  "game_custom_data": {
+    "multiplayer_synchronized": true
+  }
+}

@@ -1,0 +1,20 @@
+# Country scope
+cie_chinese_country = {
+    is_country_alive = yes
+    OR = {
+        country_definition = cd:CHI
+        AND = {
+            exists = civil_war_origin_country
+            civil_war_origin_country ?= { country_definition = cd:CHI }
+        }
+        AND = {
+            has_global_variable = chinese_central_government
+            global_var:chinese_central_government ?= this
+        }
+    }
+}
+
+# State scope
+cie_shandong_headquarters = {
+    state_region = s:STATE_SHANDONG
+}
